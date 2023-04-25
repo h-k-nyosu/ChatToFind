@@ -1,16 +1,22 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #F5F5F5;
+    color: #333;
+    display: flex; /* 追加 */
+}
+
+.main-content {
+    flex: 2; /* 画面の左側2/3を占める */
+    display: flex;
+    flex-direction: column;
 }
 
 .container {
-    display: flex;
-    height: 100vh;
-}
-
-.main {
-    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px;
 }
 
 .item-grid {
@@ -25,12 +31,31 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: #FFFFFF;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 20px;
+    height: 150px;
+}
+
+.item img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.item-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 10px;
 }
 
 .sidebar {
     width: 300px;
-    background-color: #f0f0f0;
-    border-left: 1px solid #ccc;
+    background-color: #FFFFFF;
+    border-left: 1px solid #E0E0E0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .chat {
