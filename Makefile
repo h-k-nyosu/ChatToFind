@@ -1,7 +1,7 @@
 .PHONY: install run
 
 install:
-	pip -r requirements.txt
+	poetry install
 
 run:
-	uvicorn app.main:app --reload
+	poetry run uvicorn app.main:app --reload
