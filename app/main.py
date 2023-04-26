@@ -11,12 +11,19 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 templates = Jinja2Templates(directory="app/templates")
 
+items_per_row = 3
+rows = 3
+
 
 @app.get("/")
 async def index(request: Request):
     items = crud.get_items()
+    item_rows = [
+        items[i : i + items_per_row] for i in range(0, len(items), items_per_row)
+    ]
+
     return templates.TemplateResponse(
-        "index.html", {"request": request, "items": items}
+        "index.html", {"request": request, "item_rows": item_rows}
     )
 
 
