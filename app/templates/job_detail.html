@@ -1,0 +1,23 @@
+<!-- app/templates/job_detail.html -->
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <title>{{ job.title }}</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>{{ job.title }}</h1>
+      <p>職種: {{ job.job_type }}</p>
+      <h2>仕事概要</h2>
+      <p>{{ job.job_overview }}</p>
+      <h2>仕事詳細</h2>
+      <p>{{ job.job_details }}</p>
+      <h2>勤務地</h2>
+      <p>{{ job.location }}</p>
+    </div>
+    <script src="/static/js/main.js"></script>
+  </body>
+</html>
