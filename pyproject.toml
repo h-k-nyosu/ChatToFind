@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "chat-to-find"
+version = "0.1.0"
+description = ""
+authors = ["h-k-nyosu <kuro.h1020@gmail.com>"]
+readme = "README.md"
+packages = [{include = "chat_to_find"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.1"
+uvicorn = "^0.21.1"
+Jinja2 = "^3.1.2"
+gunicorn = "^20.1.0"
+SQLAlchemy = "^2.0.10"
+psycopg2 = "^2.9.6"
+python-dotenv = "^1.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
