@@ -2,3 +2,7 @@ fastapi
 uvicorn
 jinja2
 gunicorn
+databases
+sqlalchemy
+psycopg2
+python-dotenv

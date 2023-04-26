@@ -4,18 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/main.css" />
-    <title>アイテムとチャット</title>
+    <title>求人とチャット</title>
   </head>
   <body>
     <div class="main-content">
       <div class="item-grid">
-        {% for row in item_rows %}
+        {% for row in job_rows %}
         <div class="item-row">
-          {% for item in row %}
-          <div class="item">
-            <img src="{{ item.image }}" alt="{{ item.name }}" />
-            <h3>{{ item.name }}</h3>
-          </div>
+          {% for job in row %}
+          <a href="/jobs/{{ job.id }}">
+            <div class="item">
+              <h3>{{ job.title }}</h3>
+              <p>{{ job.job_type }}</p>
+            </div>
+          </a>
           {% endfor %}
         </div>
         {% endfor %}

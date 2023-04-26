@@ -1,17 +1,11 @@
 from typing import List
-from .models import Item
+from .models import Item, Job
+from sqlalchemy.orm import Session
 
 
-def get_items() -> List[Item]:
-    items = [
-        Item(name="アイテム1", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム2", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム3", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム4", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム5", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム6", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム7", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム8", image="https://placehold.jp/300x100.png"),
-        Item(name="アイテム9", image="https://placehold.jp/300x100.png"),
-    ]
-    return items
+def get_job(db: Session, job_id: int):
+    return db.query(Job).filter(Job.id == job_id).first()
+
+
+def get_jobs(db: Session):
+    return db.query(Job).all()
