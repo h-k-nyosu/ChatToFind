@@ -3,8 +3,6 @@ name = "chat-to-find"
 version = "0.1.0"
 description = ""
 authors = ["h-k-nyosu <kuro.h1020@gmail.com>"]
-readme = "README.md"
-packages = [{include = "chat_to_find"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
