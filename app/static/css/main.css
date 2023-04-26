@@ -2,12 +2,13 @@ body {
   font-family: "Roboto", sans-serif;
   background-color: #f5f5f5;
   color: #333;
-  display: flex; /* 追加 */
+  display: flex;
   height: 100vh;
+  margin: 0;
 }
 
 .main-content {
-  flex: 2; /* 画面の左側2/3を占める */
+  flex: 2;
   display: flex;
   flex-direction: column;
 }
@@ -21,16 +22,18 @@ body {
 }
 
 .item-grid {
-  /* display: grid; */
-  grid-template-columns: repeat(3, 1fr); /* 追加 */
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
   overflow: hidden;
+  padding: 20px;
 }
 
 .item-row {
   display: flex;
-  gap: 10px;
-  animation: scroll-items 30s linear infinite;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .item {
@@ -38,13 +41,18 @@ body {
   flex-direction: column;
   align-items: center;
   background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   padding: 20px;
   margin: 10px;
   height: 150px;
-  width: calc(100% / 3.5);
+  width: calc(100% / 1.5);
   flex-shrink: 0;
+  transition: transform 0.3s;
+}
+
+.item:hover {
+  transform: translateY(-5px);
 }
 
 @keyframes scroll-items {
@@ -97,4 +105,23 @@ body {
 #chat-input {
   flex: 1;
   padding: 10px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+button[type="submit"] {
+  background-color: #6200ee;
+  color: #fff;
+  font-size: 14px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button[type="submit"]:hover {
+  background-color: #3700b3;
 }
