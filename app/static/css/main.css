@@ -13,27 +13,24 @@ body {
   flex-direction: column;
 }
 
-.container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  gap: 10px;
-  padding: 20px;
-}
 
 .item-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
   overflow: hidden;
   padding: 20px;
 }
 
 .item-row {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
   margin-bottom: 20px;
+}
+
+.item-row a {
+  width: 100%;
 }
 
 .item {
@@ -44,9 +41,8 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   padding: 20px;
-  margin: 10px;
   height: 150px;
-  width: calc(100% / 1.5);
+  width: 400px
   flex-shrink: 0;
   transition: transform 0.3s;
 }
