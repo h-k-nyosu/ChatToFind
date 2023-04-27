@@ -7,12 +7,15 @@ body {
   margin: 0;
 }
 
+a {
+  text-decoration: none;
+}
+
 .main-content {
   flex: 2;
   display: flex;
   flex-direction: column;
 }
-
 
 .item-grid {
   display: grid;
@@ -29,26 +32,53 @@ body {
   margin-bottom: 20px;
 }
 
-.item-row a {
-  width: 100%;
-}
-
 .item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-areas:
+    "job-type"
+    "job-title"
+    "monthly-salary"
+    "location";
+  grid-template-rows: 30px 100px 30px 80px;
   background-color: #ffffff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
-  padding: 20px;
-  height: 150px;
-  width: 400px
+  height: 200px;
+  width: 90%;
+  padding: 10px;
   flex-shrink: 0;
   transition: transform 0.3s;
 }
 
 .item:hover {
   transform: translateY(-5px);
+}
+
+.item p,
+.item h3 {
+  color: rgba(0, 0, 0, 0.9);
+  -webkit-line-clamp: 3;
+}
+
+.item-job-type {
+  grid-area: job-type;
+}
+
+.item-job-title {
+  grid-area: job-title;
+}
+
+.item-job-monthly-salary {
+  grid-area: monthly-salary;
+  font-size: 0.9rem;
+}
+
+.item-job-location {
+  grid-area: location;
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @keyframes scroll-items {
@@ -58,19 +88,6 @@ body {
   100% {
     transform: translateX(-100%);
   }
-}
-
-.item img {
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: 5px;
-}
-
-.item-name {
-  font-size: 14px;
-  font-weight: bold;
-  margin-top: 10px;
 }
 
 .sidebar {

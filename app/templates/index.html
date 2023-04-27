@@ -14,8 +14,12 @@
           {% for job in row %}
           <a href="/jobs/{{ job.id }}">
             <div class="item">
-              <h3>{{ job.title }}</h3>
-              <p>{{ job.job_type }}</p>
+              <p class="item-job-type">#{{ job.job_type }}</p>
+              <h3 class="item-job-title">{{ job.title }}</h3>
+              <p class="item-job-monthly-salary">
+                月給：{{ job.monthly_salary }}円
+              </p>
+              <p class="item-job-location">勤務地：{{ job.location }}</p>
             </div>
           </a>
           {% endfor %}
