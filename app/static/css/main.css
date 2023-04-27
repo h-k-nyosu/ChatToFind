@@ -78,7 +78,7 @@ body {
 }
 
 .sidebar {
-  width: 300px;
+  width: 400px;
   background-color: #ffffff;
   border-left: 1px solid #e0e0e0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -124,4 +124,51 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
   background-color: #3700b3;
+}
+
+.user-message-container,
+.ai-message-container {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.user-message-avatar,
+.ai-message-avatar {
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-message-content,
+.ai-message-content {
+  flex: 8;
+}
+
+.user-message-content p,
+.ai-message-content p {
+  margin-top: 0;
+}
+
+.user-message-avatar img,
+.ai-message-avatar img {
+  max-width: 30px;
+  height: auto;
+  border-radius: 50%;
+}
+
+.user-text,
+.ai-text {
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 10px;
+}
+
+.user-text {
+  background-color: #f0f0f0;
+}
+
+.ai-text {
+  background-color: #e0e0e0;
 }
