@@ -92,15 +92,19 @@ def create_jobs(query:str):
         return res 
 
 def main():
-    job_list = ["販売スタッフ","カスタマーサポート", "ソフトウェアエンジニア", "グラフィックデザイナー", "データアナリスト", "プロジェクトマネージャー", "ウェブデザイナー", "マーケティングスペシャリスト", "広報・PR担当", "人事担当", "経理・財務担当", "営業担当", "イベントプランナー", "コンサルタント", "システム管理者", "コンテンツライター・エディター", "翻訳者・通訳者", "保育士・幼稚園教諭", "教育コーディネーター", "医師・看護師", "物流・倉庫管理", "料理人・シェフ", "バーテンダー", "美容師・美容部員", "フィットネスインストラクター", "不動産エージェント", "旅行アドバイザー", "インテリアデザイナー", "農業・園芸関連職", "環境・エネルギー関連職"]
+    job_list = ["ソフトウェアエンジニア", "グラフィックデザイナー", "データアナリスト", "プロジェクトマネージャー", "ウェブデザイナー", "マーケティングスペシャリスト", "広報・PR担当", "人事担当", "経理・財務担当", "営業担当", "イベントプランナー", "コンサルタント", "システム管理者", "コンテンツライター・エディター", "翻訳者・通訳者", "保育士・幼稚園教諭", "教育コーディネーター", "医師・看護師", "物流・倉庫管理", "料理人・シェフ", "バーテンダー", "美容師・美容部員", "フィットネスインストラクター", "不動産エージェント", "旅行アドバイザー", "インテリアデザイナー", "農業・園芸関連職", "環境・エネルギー関連職"]
     for job in job_list:
         for i in range(5):
-            print(f"[INFO] {i}回目 職種名: {job}")
-            job_text = generate_job_text(job)
-            print(f"[INFO] job_text: {job_text}")
-            job_query = convert_to_sql(job_text)
-            print(f"[INFO] job_query: {job_query}")
-            res = create_jobs(job_query)
-            print(f"[INFO] res: {res}")
+            try:
+                print(f"[INFO] {i}回目 職種名: {job}")
+                job_text = generate_job_text(job)
+                print(f"[INFO] job_text: {job_text}")
+                job_query = convert_to_sql(job_text)
+                print(f"[INFO] job_query: {job_query}")
+                res = create_jobs(job_query)
+                print(f"[INFO] res: {res}")
+            except BaseException as e:
+                print(f"[ERROR] {e}")
+            
 
 main()
