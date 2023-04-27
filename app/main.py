@@ -62,6 +62,7 @@ class ChainStreamHandler(StreamingStdOutCallbackHandler):
         self.gen = gen
 
     def on_llm_new_token(self, token: str, **kwargs):
+        print(f"token: {token}")
         self.gen.send(f"data: {token}\n\n")
 
 def chat_response_thread(g, prompt):
@@ -76,6 +77,7 @@ def chat_response_thread(g, prompt):
         chat([SystemMessage(content="You are a poetic assistant"), HumanMessage(content=prompt)])
 
     finally:
+        g.send(f"data: END\n\n")
         g.close()
 
 def generate_chat_response(prompt):

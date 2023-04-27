@@ -10,7 +10,7 @@ chatForm.addEventListener("submit", (event) => {
 
 function sendUserMessage(message, isFirstEmptyMessage) {
   // メッセージが空の場合、何もしない
-  if (message.trim() === "") {
+  if (message.trim() === "END") {
     return;
   }
 
@@ -65,11 +65,8 @@ function sendUserMessage(message, isFirstEmptyMessage) {
   );
 
   source.onmessage = function (event) {
-    if (event.data.trim() === "") {
-      if (isFirstEmptyMessage) {
-        isFirstEmptyMessage = false;
-        return;
-      }
+    console.log("event.data.trim(): " + event.data.trim());
+    if (event.data.trim() === "END") {
       source.close(); // メッセージが完了したらEventSourceを閉じる
     } else {
       aiMessageP.innerText += `${event.data}`;
