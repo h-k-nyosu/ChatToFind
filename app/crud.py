@@ -1,5 +1,5 @@
 from typing import List
-from .models import Item, Job
+from .models import Job
 from sqlalchemy.orm import Session
 
 

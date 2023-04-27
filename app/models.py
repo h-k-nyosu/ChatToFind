@@ -3,11 +3,6 @@ from sqlalchemy import Column, Integer, String
 from app.database import Base
 
 
-class Item(BaseModel):
-    name: str
-    image: str
-
-
 class Job(Base):
     __tablename__ = "jobs"
 
