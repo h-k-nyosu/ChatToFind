@@ -16,4 +16,5 @@ class Job(Base):
     job_type = Column(String)
     job_summary = Column(String)
     job_details = Column(String)
+    monthly_salary = Column(Integer)
     location = Column(String)
