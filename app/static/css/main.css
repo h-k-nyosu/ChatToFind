@@ -82,11 +82,11 @@ a {
 }
 
 .animate-up {
-  animation: animate-up 100s ease infinite;
+  animation: animate-up 80s linear infinite;
 }
 
 .animate-down {
-  animation: animate-down 150s ease infinite;
+  animation: animate-down 150s linear infinite;
 }
 
 @keyframes animate-up {
