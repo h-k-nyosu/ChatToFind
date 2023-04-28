@@ -9,13 +9,19 @@
   <body>
     <div class="main-content">
       <div class="item-grid">
-        {% for row in job_rows %}
-        <div class="item-row">
-          {% for job in row %}
+        {% for row in job_rows %} {% if loop.index0 % 2 == 0 %}
+        <div class="item-row animate-up">
+          {% else %}
+          <div class="item-row animate-down">
+          {% endif %} {% for job in row %}
           <a href="/jobs/{{ job.id }}">
             <div class="item">
-              <h3>{{ job.title }}</h3>
-              <p>{{ job.job_type }}</p>
+              <p class="item-job-type">#{{ job.job_type }}</p>
+              <h3 class="item-job-title">{{ job.title }}</h3>
+              <p class="item-job-monthly-salary">
+                月給：{{ job.monthly_salary }}円
+              </p>
+              <p class="item-job-location">勤務地：{{ job.location }}</p>
             </div>
           </a>
           {% endfor %}
