@@ -9,9 +9,11 @@
   <body>
     <div class="main-content">
       <div class="item-grid">
-        {% for row in job_rows %}
-        <div class="item-row">
-          {% for job in row %}
+        {% for row in job_rows %} {% if loop.index0 % 2 == 0 %}
+        <div class="item-row animate-up">
+          {% else %}
+          <div class="item-row animate-down">
+          {% endif %} {% for job in row %}
           <a href="/jobs/{{ job.id }}">
             <div class="item">
               <p class="item-job-type">#{{ job.job_type }}</p>

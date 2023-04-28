@@ -19,7 +19,7 @@ a {
 
 .item-grid {
   display: grid;
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 5px;
   overflow: hidden;
   padding: 20px;
@@ -27,7 +27,7 @@ a {
 
 .item-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   gap: 10px;
   margin-bottom: 20px;
 }
@@ -81,12 +81,29 @@ a {
   white-space: nowrap;
 }
 
-@keyframes scroll-items {
+.animate-up {
+  animation: animate-up 100s ease infinite;
+}
+
+.animate-down {
+  animation: animate-down 150s ease infinite;
+}
+
+@keyframes animate-up {
   0% {
-    transform: translateX(0);
+    transform: translateY(0);
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateY(-1000px);
+  }
+}
+
+@keyframes animate-down {
+  0% {
+    transform: translateY(-1000px);
+  }
+  100% {
+    transform: translateY(0);
   }
 }
 

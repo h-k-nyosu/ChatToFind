@@ -27,7 +27,6 @@ from app.dependencies import get_db
 import app.crud as crud
 import app.models as models
 import app.crud as crud
-import app.schemas as schemas
 
 
 app = FastAPI()
@@ -88,7 +87,7 @@ def generate_chat_response(prompt):
 @app.get("/")
 async def index(request: Request, db: Session = Depends(get_db)):
     jobs = crud.get_jobs(db)
-    jobs_per_row = 3
+    jobs_per_row = 30
     job_rows = [jobs[i : i + jobs_per_row] for i in range(0, len(jobs), jobs_per_row)]
 
     return templates.TemplateResponse(
