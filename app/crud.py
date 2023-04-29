@@ -30,10 +30,10 @@ def get_custom_jobs(db: Session, query_params: dict):
         )
 
     if "job_type" in query_params:
-        query = query.filter(Job.job_type == query_params["job_type"])
+        query = query.filter(Job.job_type.ilike(f"%{query_params['job_type']}%"))
 
     if "location" in query_params:
-        query = query.filter(Job.location == query_params["location"])
+        query = query.filter(Job.location.ilike(f"%{query_params['location']}%"))
 
     if "min_salary" in query_params:
         query = query.filter(Job.monthly_salary >= query_params["min_salary"])
