@@ -22,7 +22,6 @@ from app.database import SessionLocal
 from app.dependencies import get_db
 
 import app.crud as crud
-import app.crud as crud
 
 load_dotenv()
 
@@ -59,7 +58,6 @@ class ChainStreamHandler(StreamingStdOutCallbackHandler):
         self.gen = gen
 
     def on_llm_new_token(self, token: str, **kwargs):
-        print(f"token: {token}")
         self.gen.send(f"data: {token}\n\n")
 
 
@@ -124,16 +122,13 @@ async def stream_chat_response(message: str):
 
 
 @app.get("/search-items")
-async def get_search_items(message: str):
-    search_results = {
-        "search_title": "コップ",
-        "items": [
-            {"id": 1, "name": "コップ1"},
-            {"id": 2, "name": "コップ2"},
-            {"id": 3, "name": "コップ3"},
-        ],
+async def get_search_items(message: str, db: Session = Depends(get_db)):
+    query_params = {
+        "keyword": "ソフトウェアエンジニア",
+        "min_salary": 200000,
     }
-    return json.dumps(search_results)
+    search_results = crud.get_custom_jobs(query_params=query_params, db=db)
+    return search_results
 
 
 if __name__ == "__main__":
