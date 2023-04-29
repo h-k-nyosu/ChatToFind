@@ -228,6 +228,14 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jsonfinder"
+version = "0.4.2"
+description = "Easily handle JSON contained within strings.\nIncludes a command-line tool to format JSON within the input, similar to the builtin json.tool."
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "langchain"
 version = "0.0.150"
 description = "Building applications with LLMs through composability"
@@ -616,7 +624,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "9a06dc6346c64e4174e44e5826cc10c9764da34d4397fe94892ec4990d343a0f"
+content-hash = "398d65f185ff2f2c13d736be6c6fb03ab0a2711cffaeffb8bd48a2a65f60543c"
 
 [metadata.files]
 aiohttp = [
@@ -1001,6 +1009,9 @@ idna = [
 Jinja2 = [
     {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
     {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+]
+jsonfinder = [
+    {file = "jsonfinder-0.4.2.tar.gz", hash = "sha256:9845ca2d1e54aa007a2a72aaa07dcc90f516587cfe40cb6df214c9cf19bc1f6f"},
 ]
 langchain = [
     {file = "langchain-0.0.150-py3-none-any.whl", hash = "sha256:d84d7a8d5f93432a17ca2675e177d93db96ddc8ee2c96356ee74c795cd316034"},
