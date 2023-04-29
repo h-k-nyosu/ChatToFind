@@ -2,12 +2,6 @@ const chatMessages = document.getElementById("chat-messages");
 const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
 
-chatForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  sendUserMessage(chatInput.value, true);
-  chatInput.value = "";
-});
-
 function responseAiMessage(message) {
   // メッセージが空の場合、何もしない
   if (message.trim() === "END") {
@@ -63,18 +57,22 @@ function responseAiMessage(message) {
   const source = new EventSource(
     `/question-stream?message=${encodeURIComponent(message)}`
   );
-
+  console.log("question-stream start");
   source.onmessage = function (event) {
     if (event.data.trim() === "END") {
       source.close(); // メッセージが完了したらEventSourceを閉じる
+      console.log("question-stream finish");
     } else {
+      console.log("aiMessageP: " + `${event.data}`);
       aiMessageP.innerText += `${event.data}`;
       chatMessages.appendChild(aiMessageContainer);
+      console.log("chatMessages.append(" + `${event.data}` + ")");
     }
   };
 }
 
 function fetchSearchItems(message) {
+  console.log("fetchSearchItems start");
   fetch(`/search-items?message=${encodeURIComponent(message)}`)
     .then((response) => {
       if (!response.ok) {
@@ -84,6 +82,11 @@ function fetchSearchItems(message) {
     })
     .then((searchResults) => {
       console.log(searchResults);
+      console.log("searchResults.title: " + searchResults.title);
+      console.log(
+        "searchResults.search_results: " + searchResults.search_results
+      );
+      console.log("fetchSearchItems finish");
     })
     .catch((error) => {
       console.error(error);
@@ -94,3 +97,9 @@ function sendUserMessage(message) {
   responseAiMessage(message);
   fetchSearchItems(message);
 }
+
+chatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendUserMessage(chatInput.value);
+  chatInput.value = "";
+});

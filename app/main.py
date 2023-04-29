@@ -8,8 +8,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
-import json
-
+import openai
+from jsonfinder import jsonfinder
 
 from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import CallbackManager
@@ -70,6 +70,7 @@ def chat_response_thread(g, prompt):
             temperature=0.7,
             openai_api_key=os.environ.get("OPENAI_API_KEY"),
         )
+        print("chat_response start")
         chat(
             [
                 SystemMessage(
@@ -78,6 +79,7 @@ def chat_response_thread(g, prompt):
                 HumanMessage(content=prompt),
             ]
         )
+        print("chat_response end")
 
     finally:
         g.send(f"data: END\n\n")
@@ -121,14 +123,96 @@ async def stream_chat_response(message: str):
     )
 
 
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+GENERATE_SEARCH_QUERY_PROMPT = """
+あなたは検索クエリジェネレータです。
+与えられた文章から、関連する求人データを検索するための検索クエリを生成してください。ただし以下の制約条件に従うこと。
+
+## 制約条件
+・出力結果例の形式に従ってJSON形式で回答します
+・search_queryはスキーマに従うこと
+・2~5件の検索クエリを生成すること
+・titleには検索を一言で表す言葉を生成すること。最終的に`[title]の求人`として出力されます
+・不足している検索条件があれば勝手に補ってください
+
+## スキーマ
+class JobQueryParams:
+    keyword: Optional[str] = None
+    job_type: Optional[str] = None
+    location: Optional[str] = None
+    min_salary: Optional[int] = None
+    max_salary: Optional[int] = None
+    sort_by: Optional[str] = None
+    order: Optional[str] = None
+
+## 出力結果例
+1件目
+{
+    "title": "ソフトウェアエンジニア",
+    "search_query": {
+        "keyword": "Software Engineer",
+        "job_type": "Full Time",
+        "location": "Tokyo",
+        "min_salary": 300000,
+        "max_salary": 600000,
+        "sort_by": "monthly_salary",
+        "order": "desc"
+    }
+}
+
+2件目
+{
+    "title": "データサイエンティスト",
+    "search_query": {
+        "keyword": "Data Scientist"
+    }
+}
+"""
+
+
+async def generate_search_query(text):
+    print("generate_search_query start")
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": f"{GENERATE_SEARCH_QUERY_PROMPT}"},
+            {"role": "user", "content": f"{text}"},
+        ],
+        max_tokens=2000,
+    )
+    print("generate_search_query finish")
+
+    sql_response = response["choices"][0]["message"]["content"]
+    return sql_response
+
+
+def parse_json(text):
+    res_jsonfinder = jsonfinder(text)
+    res_json = []
+    for res in res_jsonfinder:
+        if res[2]:
+            res_json.append(res[2])
+    return res_json
+
+
 @app.get("/search-items")
 async def get_search_items(message: str, db: Session = Depends(get_db)):
-    query_params = {
-        "keyword": "ソフトウェアエンジニア",
-        "min_salary": 200000,
-    }
-    search_results = crud.get_custom_jobs(query_params=query_params, db=db)
-    return search_results
+    print(f"message: {message}")
+    search_query_str = await generate_search_query(message)
+    print(f"search_query_str: {search_query_str}")
+    search_query_list = parse_json(search_query_str)
+    print(f"search_query_list: {search_query_list}")
+    response = []
+    for search_query in search_query_list:
+        search_results = crud.get_custom_jobs(
+            query_params=search_query["search_query"], db=db
+        )
+        response.append(
+            {"title": search_query["title"], "search_results": search_results}
+        )
+    print(f"response: {response}")
+    return response
 
 
 if __name__ == "__main__":
