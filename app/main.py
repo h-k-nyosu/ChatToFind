@@ -139,25 +139,17 @@ GENERATE_SEARCH_QUERY_PROMPT = """
 ## スキーマ
 class JobQueryParams:
     keyword: Optional[str] = None
-    job_type: Optional[str] = None
     location: Optional[str] = None
     min_salary: Optional[int] = None
-    max_salary: Optional[int] = None
-    sort_by: Optional[str] = None
-    order: Optional[str] = None
 
 ## 出力結果例
 1件目
 {
     "title": "ソフトウェアエンジニア",
     "search_query": {
-        "keyword": "Software Engineer",
-        "job_type": "Full Time",
-        "location": "Tokyo",
-        "min_salary": 300000,
-        "max_salary": 600000,
-        "sort_by": "monthly_salary",
-        "order": "desc"
+        "keyword": "ソフトウェアエンジニア",
+        "location": "東京",
+        "min_salary": 200000,
     }
 }
 
@@ -165,7 +157,7 @@ class JobQueryParams:
 {
     "title": "データサイエンティスト",
     "search_query": {
-        "keyword": "Data Scientist"
+        "keyword": "データサイエンティスト"
     }
 }
 """
@@ -205,6 +197,7 @@ async def get_search_items(message: str, db: Session = Depends(get_db)):
     print(f"search_query_list: {search_query_list}")
     response = []
     for search_query in search_query_list:
+        print(f"search_query: {search_query['search_query']}")
         search_results = crud.get_custom_jobs(
             query_params=search_query["search_query"], db=db
         )
