@@ -8,7 +8,7 @@ chatForm.addEventListener("submit", (event) => {
   chatInput.value = "";
 });
 
-function sendUserMessage(message, isFirstEmptyMessage) {
+function responseAiMessage(message) {
   // メッセージが空の場合、何もしない
   if (message.trim() === "END") {
     return;
@@ -65,7 +65,6 @@ function sendUserMessage(message, isFirstEmptyMessage) {
   );
 
   source.onmessage = function (event) {
-    console.log("event.data.trim(): " + event.data.trim());
     if (event.data.trim() === "END") {
       source.close(); // メッセージが完了したらEventSourceを閉じる
     } else {
@@ -73,4 +72,25 @@ function sendUserMessage(message, isFirstEmptyMessage) {
       chatMessages.appendChild(aiMessageContainer);
     }
   };
+}
+
+function fetchSearchItems(message) {
+  fetch(`/search-items?message=${encodeURIComponent(message)}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Error fetching search items");
+      }
+      return response.json();
+    })
+    .then((searchResults) => {
+      console.log(searchResults);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+function sendUserMessage(message) {
+  responseAiMessage(message);
+  fetchSearchItems(message);
 }
