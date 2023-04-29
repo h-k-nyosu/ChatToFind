@@ -73,7 +73,7 @@ def chat_response_thread(g, prompt):
             temperature=0.7,
             openai_api_key=os.environ.get("OPENAI_API_KEY")
         )
-        chat([SystemMessage(content="You are a poetic assistant"), HumanMessage(content=prompt)])
+        chat([SystemMessage(content="あなたは転職エージェントAIとしてユーザーの転職相談に乗ります。必要に応じてヒアリングをするなど、ユーザーニーズに合った提案をしてください。"), HumanMessage(content=prompt)])
 
     finally:
         g.send(f"data: END\n\n")
