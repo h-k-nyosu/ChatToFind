@@ -3,7 +3,6 @@ import threading
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
