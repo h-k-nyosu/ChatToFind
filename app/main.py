@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 
-from app.database.database import SessionLocal
+from app.database.postgresql import SessionLocal
 from app.dependencies import get_db
 from app.llm.chat import generate_chat_response
 from app.llm.generate_search_query import generate_search_query

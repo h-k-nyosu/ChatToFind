@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from app.database.database import Base
+from app.database.postgresql import Base
 
 
 class Job(Base):
