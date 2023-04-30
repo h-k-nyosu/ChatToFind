@@ -3,31 +3,26 @@ import threading
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from dotenv import load_dotenv
 import os
-
-load_dotenv()
+import openai
+from jsonfinder import jsonfinder
 
 from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.base import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.schema import (
-    HumanMessage,
-    SystemMessage
-)
+from langchain.schema import HumanMessage, SystemMessage
 
 
 from app.models import Job
-from app.database import SessionLocal, engine
+from app.database import SessionLocal
 from app.dependencies import get_db
 
 import app.crud as crud
-import app.models as models
-import app.crud as crud
 
+load_dotenv()
 
 app = FastAPI()
 
@@ -55,14 +50,15 @@ class ThreadedGenerator:
     def close(self):
         self.queue.put(StopIteration)
 
+
 class ChainStreamHandler(StreamingStdOutCallbackHandler):
     def __init__(self, gen):
         super().__init__()
         self.gen = gen
 
     def on_llm_new_token(self, token: str, **kwargs):
-        print(f"token: {token}")
         self.gen.send(f"data: {token}\n\n")
+
 
 def chat_response_thread(g, prompt):
     try:
@@ -71,18 +67,29 @@ def chat_response_thread(g, prompt):
             streaming=True,
             callback_manager=CallbackManager([ChainStreamHandler(g)]),
             temperature=0.7,
-            openai_api_key=os.environ.get("OPENAI_API_KEY")
+            openai_api_key=os.environ.get("OPENAI_API_KEY"),
         )
-        chat([SystemMessage(content="You are a poetic assistant"), HumanMessage(content=prompt)])
+        print("chat_response start")
+        chat(
+            [
+                SystemMessage(
+                    content="あなたは転職エージェントAIとしてユーザーの転職相談に乗ります。必要に応じてヒアリングをするなど、ユーザーニーズに合った提案をしてください。"
+                ),
+                HumanMessage(content=prompt),
+            ]
+        )
+        print("chat_response end")
 
     finally:
         g.send(f"data: END\n\n")
         g.close()
 
+
 def generate_chat_response(prompt):
     g = ThreadedGenerator()
     threading.Thread(target=chat_response_thread, args=(g, prompt)).start()
     return g
+
 
 @app.get("/")
 async def index(request: Request, db: Session = Depends(get_db)):
@@ -105,15 +112,100 @@ async def job_detail(job_id: int, request: Request):
         "job_detail.html", {"request": request, "job": job}
     )
 
+
 @app.get("/question-stream")
 async def stream_chat_response(message: str):
-    print(f"message: {message}")
     if not message:
         return
     return StreamingResponse(
-        generate_chat_response(message),
-        media_type='text/event-stream'
+        generate_chat_response(message), media_type="text/event-stream"
     )
+
+
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+GENERATE_SEARCH_QUERY_PROMPT = """
+あなたは検索クエリジェネレータです。
+与えられた文章から、関連する求人データを検索するための検索クエリを生成してください。ただし以下の制約条件に従うこと。
+
+## 制約条件
+・出力結果例の形式に従ってJSON形式で回答します
+・search_queryはスキーマに従うこと
+・2~5件の検索クエリを生成すること
+・titleには検索を一言で表す言葉を生成すること。最終的に`[title]の求人`として出力されます
+・不足している検索条件があれば勝手に補ってください
+
+## スキーマ
+class JobQueryParams:
+    keyword: Optional[str] = None
+    location: Optional[str] = None
+    min_salary: Optional[int] = None
+
+## 出力結果例
+1件目
+{
+    "title": "ソフトウェアエンジニア",
+    "search_query": {
+        "keyword": "ソフトウェアエンジニア",
+        "location": "東京",
+        "min_salary": 200000,
+    }
+}
+
+2件目
+{
+    "title": "データサイエンティスト",
+    "search_query": {
+        "keyword": "データサイエンティスト"
+    }
+}
+"""
+
+
+async def generate_search_query(text):
+    print("generate_search_query start")
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": f"{GENERATE_SEARCH_QUERY_PROMPT}"},
+            {"role": "user", "content": f"{text}"},
+        ],
+        max_tokens=2000,
+    )
+    print("generate_search_query finish")
+
+    sql_response = response["choices"][0]["message"]["content"]
+    return sql_response
+
+
+def parse_json(text):
+    res_jsonfinder = jsonfinder(text)
+    res_json = []
+    for res in res_jsonfinder:
+        if res[2]:
+            res_json.append(res[2])
+    return res_json
+
+
+@app.get("/search-items")
+async def get_search_items(message: str, db: Session = Depends(get_db)):
+    print(f"message: {message}")
+    search_query_str = await generate_search_query(message)
+    print(f"search_query_str: {search_query_str}")
+    search_query_list = parse_json(search_query_str)
+    print(f"search_query_list: {search_query_list}")
+    response = []
+    for search_query in search_query_list:
+        print(f"search_query: {search_query['search_query']}")
+        search_results = crud.get_custom_jobs(
+            query_params=search_query["search_query"], db=db
+        )
+        response.append(
+            {"title": search_query["title"], "search_results": search_results}
+        )
+    print(f"response: {response}")
+    return response
+
 
 if __name__ == "__main__":
     import uvicorn

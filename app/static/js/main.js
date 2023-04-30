@@ -2,13 +2,7 @@ const chatMessages = document.getElementById("chat-messages");
 const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
 
-chatForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  sendUserMessage(chatInput.value, true);
-  chatInput.value = "";
-});
-
-function sendUserMessage(message, isFirstEmptyMessage) {
+function responseAiMessage(message) {
   // メッセージが空の場合、何もしない
   if (message.trim() === "END") {
     return;
@@ -63,14 +57,91 @@ function sendUserMessage(message, isFirstEmptyMessage) {
   const source = new EventSource(
     `/question-stream?message=${encodeURIComponent(message)}`
   );
-
+  console.log("question-stream start");
   source.onmessage = function (event) {
-    console.log("event.data.trim(): " + event.data.trim());
     if (event.data.trim() === "END") {
       source.close(); // メッセージが完了したらEventSourceを閉じる
+      console.log("question-stream finish");
     } else {
+      console.log("aiMessageP: " + `${event.data}`);
       aiMessageP.innerText += `${event.data}`;
       chatMessages.appendChild(aiMessageContainer);
+      scrollToBottom();
+      console.log("chatMessages.append(" + `${event.data}` + ")");
     }
   };
+}
+
+function renderItem(job) {
+  return `
+        <a href="/jobs/${job.id}">
+          <div class="item">
+            <p class="item-job-type">#${job.job_type}</p>
+            <h3 class="item-job-title">${job.title}</h3>
+            <p class="item-job-monthly-salary">月給：${job.monthly_salary}円</p>
+            <p class="item-job-location">勤務地：${job.location}</p>
+          </div>
+        </a>
+      `;
+}
+
+function renderSearchResult(searchResult) {
+  if (searchResult.search_results.length === 0) {
+    return "";
+  }
+
+  const searchResultItems = searchResult.search_results
+    .map(renderItem)
+    .join("");
+
+  return `
+        <h2 class="search-title">${searchResult.title}</h2>
+        <div class="search-results">
+          ${searchResultItems}
+        </div>
+      `;
+}
+
+function renderMainContent(searchResults) {
+  const mainContent = document.querySelector(".main-content");
+  mainContent.innerHTML = searchResults.map(renderSearchResult).join("");
+}
+
+function fetchSearchItems(message) {
+  console.log("fetchSearchItems start");
+  fetch(`/search-items?message=${encodeURIComponent(message)}`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Error fetching search items");
+      }
+      return response.json();
+    })
+    .then((searchResults) => {
+      console.log(searchResults);
+      console.log("searchResults.title: " + searchResults.title);
+      console.log(
+        "searchResults.search_results: " + searchResults.search_results
+      );
+      console.log("fetchSearchItems finish");
+      renderMainContent(searchResults);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+function sendUserMessage(message) {
+  responseAiMessage(message);
+  fetchSearchItems(message);
+}
+
+chatForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  sendUserMessage(chatInput.value);
+  chatInput.value = "";
+});
+
+function scrollToBottom() {
+  const chatMessages = document.querySelector(".chat-messages");
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 }
