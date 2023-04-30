@@ -14,7 +14,7 @@
           {% else %}
           <div class="item-row animate-down">
           {% endif %} {% for job in row %}
-          <a href="/jobs/{{ job.id }}">
+          <a href="/jobs/{{ job.id }}" target="_blank" rel="noopener noreferrer">
             <div class="item">
               <p class="item-job-type">#{{ job.job_type }}</p>
               <h3 class="item-job-title">{{ job.title }}</h3>
