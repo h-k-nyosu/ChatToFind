@@ -66,6 +66,7 @@ function responseAiMessage(message) {
       console.log("aiMessageP: " + `${event.data}`);
       aiMessageP.innerText += `${event.data}`;
       chatMessages.appendChild(aiMessageContainer);
+      scrollToBottom();
       console.log("chatMessages.append(" + `${event.data}` + ")");
     }
   };
@@ -139,3 +140,8 @@ chatForm.addEventListener("submit", (event) => {
   sendUserMessage(chatInput.value);
   chatInput.value = "";
 });
+
+function scrollToBottom() {
+  const chatMessages = document.querySelector(".chat-messages");
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
