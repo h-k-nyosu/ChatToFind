@@ -1,4 +1,3 @@
-from jsonfinder import jsonfinder
 from sqlalchemy.orm import Session
 
 from fastapi import FastAPI, Request, Depends, HTTPException
@@ -10,23 +9,14 @@ from app.database.database import SessionLocal
 from app.dependencies import get_db
 from app.llm.chat import generate_chat_response
 from app.llm.generate_search_query import generate_search_query
-from app.llm.queries import PostgresQueries
-
+from app.database.queries import PostgresQueries
+from app.utils import parse_json
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 templates = Jinja2Templates(directory="app/templates")
-
-
-def parse_json(text):
-    res_jsonfinder = jsonfinder(text)
-    res_json = []
-    for res in res_jsonfinder:
-        if res[2]:
-            res_json.append(res[2])
-    return res_json
 
 
 @app.get("/")
