@@ -46,16 +46,18 @@ GENERATE_JOB_TEXT = """
 ・ありきたりなものではなく、見てみたくなる求人タイトルを命名してください
 """
 
-def convert_to_sql(text):
 
+def convert_to_sql(text):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[{"role": "system", "content": f"{SQL_FORMAT_PROMPT}"},
-                  {"role": "user", "content": f"{text}"}],
+        messages=[
+            {"role": "system", "content": f"{SQL_FORMAT_PROMPT}"},
+            {"role": "user", "content": f"{text}"},
+        ],
         max_tokens=2000,
     )
 
-    sql_response = response['choices'][0]['message']['content']
+    sql_response = response["choices"][0]["message"]["content"]
     return sql_response
 
 
@@ -68,7 +70,7 @@ def generate_job_text(job_type):
         max_tokens=2000,
     )
     job_text = f"職種名\n{job_type}"
-    job_text += response['choices'][0]['message']['content']
+    job_text += response["choices"][0]["message"]["content"]
     return job_text
 
 
@@ -76,6 +78,7 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 @contextmanager
 def get_db():
@@ -85,14 +88,45 @@ def get_db():
     finally:
         db.close()
 
-def create_jobs(query:str):
+
+def create_jobs(query: str):
     with get_db() as db:
         res = db.execute(text(query))
         db.commit()
-        return res 
+        return res
+
 
 def main():
-    job_list = ["ソフトウェアエンジニア", "グラフィックデザイナー", "データアナリスト", "プロジェクトマネージャー", "ウェブデザイナー", "マーケティングスペシャリスト", "広報・PR担当", "人事担当", "経理・財務担当", "営業担当", "イベントプランナー", "コンサルタント", "システム管理者", "コンテンツライター・エディター", "翻訳者・通訳者", "保育士・幼稚園教諭", "教育コーディネーター", "医師・看護師", "物流・倉庫管理", "料理人・シェフ", "バーテンダー", "美容師・美容部員", "フィットネスインストラクター", "不動産エージェント", "旅行アドバイザー", "インテリアデザイナー", "農業・園芸関連職", "環境・エネルギー関連職"]
+    job_list = [
+        "ソフトウェアエンジニア",
+        "グラフィックデザイナー",
+        "データアナリスト",
+        "プロジェクトマネージャー",
+        "ウェブデザイナー",
+        "マーケティングスペシャリスト",
+        "広報・PR担当",
+        "人事担当",
+        "経理・財務担当",
+        "営業担当",
+        "イベントプランナー",
+        "コンサルタント",
+        "システム管理者",
+        "コンテンツライター・エディター",
+        "翻訳者・通訳者",
+        "保育士・幼稚園教諭",
+        "教育コーディネーター",
+        "医師・看護師",
+        "物流・倉庫管理",
+        "料理人・シェフ",
+        "バーテンダー",
+        "美容師・美容部員",
+        "フィットネスインストラクター",
+        "不動産エージェント",
+        "旅行アドバイザー",
+        "インテリアデザイナー",
+        "農業・園芸関連職",
+        "環境・エネルギー関連職",
+    ]
     for job in job_list:
         for i in range(5):
             try:
@@ -105,6 +139,6 @@ def main():
                 print(f"[INFO] res: {res}")
             except BaseException as e:
                 print(f"[ERROR] {e}")
-            
+
 
 main()
