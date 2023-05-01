@@ -8,9 +8,8 @@ GENERATE_SEARCH_QUERY_PROMPT = """
 ## 制約条件
 ・出力結果例の形式に従ってJSON形式で回答します
 ・search_queryはスキーマに従うこと
-・2~5件の検索クエリを生成すること
+・3件の検索クエリを生成すること
 ・titleには検索を一言で表す言葉を生成すること。最終的に`[title]の求人`として出力されます
-・不足している検索条件があれば勝手に補ってください
 
 ## スキーマ
 class JobQueryParams:
@@ -20,22 +19,37 @@ class JobQueryParams:
 
 ## 出力結果例
 1件目
-{
+```json
+{{
     "title": "ソフトウェアエンジニア",
     "search_query": {
         "keyword": "ソフトウェアエンジニア",
         "location": "東京",
         "min_salary": 200000,
     }
-}
+}}
+```
 
 2件目
-{
+```json
+{{
     "title": "データサイエンティスト",
     "search_query": {
         "keyword": "データサイエンティスト"
     }
-}
+}}
+```
+
+3件目
+```json
+{{
+    "title": "販売スタッフ",
+    "search_query": {
+        "keyword": "販売スタッフ"
+    }
+}}
+```
+
 """
 
 
