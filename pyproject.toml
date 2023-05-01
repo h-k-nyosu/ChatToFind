@@ -17,6 +17,7 @@ jsonfinder = "^0.4.2"
 requests-aws4auth = "^1.2.2"
 opensearch-py = "^2.2.0"
 opensearch-dsl = "^2.1.0"
+boto3 = "^1.26.124"
 
 
 [tool.poetry.group.dev.dependencies]
