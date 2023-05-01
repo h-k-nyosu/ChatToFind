@@ -1,17 +1,12 @@
-from sqlalchemy.orm import Session
-
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 
-from app.database.postgresql import SessionLocal
-from app.dependencies import get_db
 from app.llm.chat import generate_chat_response
 from app.llm.generate_search_query import generate_search_query
 from app.database.queries import OpensearchQueries
 from app.utils import parse_json
-from app.schemas import Job
 
 app = FastAPI()
 

@@ -47,7 +47,6 @@ def chat_response_thread(g, prompt):
             temperature=0.7,
             openai_api_key=OPENAI_API_KEY,
         )
-        print("chat_response start")
         chat(
             [
                 SystemMessage(
@@ -56,7 +55,6 @@ def chat_response_thread(g, prompt):
                 HumanMessage(content=prompt),
             ]
         )
-        print("chat_response end")
 
     finally:
         g.send(f"data: END\n\n")
