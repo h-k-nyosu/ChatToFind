@@ -9,7 +9,7 @@ from app.database.postgresql import SessionLocal
 from app.dependencies import get_db
 from app.llm.chat import generate_chat_response
 from app.llm.generate_search_query import generate_search_query
-from app.database.queries import PostgresQueries
+from app.database.queries import OpensearchQueries
 from app.utils import parse_json
 
 app = FastAPI()
@@ -18,10 +18,12 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 templates = Jinja2Templates(directory="app/templates")
 
+opensearch_queries = OpensearchQueries()
+
 
 @app.get("/")
-async def index(request: Request, db: Session = Depends(get_db)):
-    jobs = PostgresQueries.get_jobs(db)
+async def index(request: Request):
+    jobs = opensearch_queries.get_jobs()
     jobs_per_row = 30
     job_rows = [jobs[i : i + jobs_per_row] for i in range(0, len(jobs), jobs_per_row)]
 
@@ -33,7 +35,7 @@ async def index(request: Request, db: Session = Depends(get_db)):
 @app.get("/jobs/{job_id}")
 async def job_detail(job_id: int, request: Request):
     db = SessionLocal()
-    job = PostgresQueries.get_job(db, job_id)
+    job = opensearch_queries.get_job(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return templates.TemplateResponse(
@@ -51,7 +53,7 @@ async def stream_chat_response(message: str):
 
 
 @app.get("/search-items")
-async def get_search_items(message: str, db: Session = Depends(get_db)):
+async def get_search_items(message: str):
     print(f"message: {message}")
     search_query_str = await generate_search_query(message)
 
@@ -65,8 +67,8 @@ async def get_search_items(message: str, db: Session = Depends(get_db)):
     response = []
     for search_query in search_query_list:
         print(f"search_query: {search_query['search_query']}")
-        search_results = PostgresQueries.get_custom_jobs(
-            query_params=search_query["search_query"], db=db
+        search_results = opensearch_queries.get_custom_jobs(
+            query_params=search_query["search_query"]
         )
         response.append(
             {"title": search_query["title"], "search_results": search_results}
