@@ -1,7 +1,7 @@
 from typing import List
 from sqlalchemy import or_, desc, asc
 from sqlalchemy.orm import Session
-from elasticsearch_dsl import Search, Q
+from opensearch_dsl import Search
 
 from abc import ABC, abstractmethod
 
@@ -65,13 +65,13 @@ class OpensearchQueries(BaseQueries):
     def __init__(self):
         self.client = os_client
 
-    def get_job(self, job_id: int):
-        search = Search(using=self.client, index="jobs").filter("term", id=job_id)
+    def get_job(self, job_id: str):
+        search = Search(using=self.client, index="jobs").filter("term", _id=job_id)
         response = search.execute()
         return response.hits[0] if response.hits else None
 
     def get_jobs(self):
-        search = Search(using=self.client, index="jobs")
+        search = Search(using=self.client, index="jobs").params(size=90)
         response = search.execute()
         return response.hits
 
