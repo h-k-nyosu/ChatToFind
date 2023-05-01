@@ -24,25 +24,9 @@ opensearch_queries = OpensearchQueries()
 
 @app.get("/")
 async def index(request: Request):
-    res_list = opensearch_queries.get_jobs()
-
-    jobs = []
-    for res in res_list:
-        # res.__dict__から必要なデータを取得し、Jobスキーマに変換
-        job_data = res.__dict__["_d_"]
-        job_data["id"] = res.meta["id"]  # idを適切な型に変換
-        job = Job(**job_data)
-
-        # ジョブをリストに追加
-        jobs.append(job)
-    print(len(res_list))
+    jobs = opensearch_queries.get_jobs()
     jobs_per_row = 30
     job_rows = [jobs[i : i + jobs_per_row] for i in range(0, len(jobs), jobs_per_row)]
-    print(len(job_rows))
-
-    for i, job in enumerate(job_rows):
-        print(f"{i}回目: {job}")
-        print(" ")
 
     return templates.TemplateResponse(
         "index.html", {"request": request, "job_rows": job_rows}
@@ -51,7 +35,6 @@ async def index(request: Request):
 
 @app.get("/jobs/{job_id}")
 async def job_detail(job_id: str, request: Request):
-    # db = SessionLocal()
     job = opensearch_queries.get_job(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
