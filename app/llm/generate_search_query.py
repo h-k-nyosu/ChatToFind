@@ -40,7 +40,6 @@ class JobQueryParams:
 
 
 async def generate_search_query(text):
-    print("generate_search_query start")
     openai.api_key = OPENAI_API_KEY
 
     response = await openai.ChatCompletion.acreate(
@@ -51,7 +50,6 @@ async def generate_search_query(text):
         ],
         max_tokens=2000,
     )
-    print("generate_search_query finish")
 
     sql_response = response["choices"][0]["message"]["content"]
     return sql_response
