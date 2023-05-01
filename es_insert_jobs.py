@@ -4,36 +4,43 @@ import openai
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from requests_aws4auth import AWS4Auth
 from dotenv import load_dotenv
-from jsonfinder import jsonfinder
-import json
-from pydantic import BaseModel
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-# REGION = "ap-northeast-1"
-# OPENSEARCH_HOST = os.environ.get("OPENSEARCH_HOST")
-# SERVICE = "es"
+REGION = "ap-northeast-1"
+OPENSEARCH_HOST = os.environ.get("OPENSEARCH_HOST")
+SERVICE = "es"
 
-# # AWS認証情報の取得
-# credentials = boto3.Session().get_credentials()
-# aws_auth = AWS4Auth(
-#     credentials.access_key,
-#     credentials.secret_key,
-#     REGION,
-#     SERVICE,
-#     session_token=credentials.token,
-# )
 
-# # OpenSearchクライアントの作成
-# os_client = OpenSearch(
-#     hosts=[{"host": OPENSEARCH_HOST, "port": 443}],
-#     http_auth=aws_auth,
-#     use_ssl=True,
-#     verify_certs=True,
-#     connection_class=RequestsHttpConnection,
-#     timeout=300,
-# )
+# AWS認証情報の取得
+credentials = boto3.Session().get_credentials()
+aws_auth = AWS4Auth(
+    credentials.access_key,
+    credentials.secret_key,
+    REGION,
+    SERVICE,
+    session_token=credentials.token,
+)
+
+# OpenSearchクライアントの作成
+os_client = OpenSearch(
+    hosts=[{"host": OPENSEARCH_HOST, "port": 443}],
+    http_auth=aws_auth,
+    use_ssl=True,
+    verify_certs=True,
+    connection_class=RequestsHttpConnection,
+    timeout=300,
+)
+
+## index削除コード。indexを作成し直すときにコメントアウトを外す。
+# index_name = "jobs"
+
+# if os_client.indices.exists(index=index_name):
+#     os_client.indices.delete(index=index_name)
+#     print(f"Index '{index_name}' deleted.")
+# else:
+#     print(f"Index '{index_name}' does not exist.")
 
 
 GENERATE_JOB_TEXT = """
@@ -42,6 +49,7 @@ GENERATE_JOB_TEXT = """
 ## 制約条件
 ・内容は実際にありそうな具体的なものにしてください。実在しなくても可。
 ・仕事詳細は500文字以上で具体的に記載します
+・月給はINT型です
 ・求人タイトル、仕事概要、仕事詳細は求人に応募したいと思う魅力的な文章にしてください
 ・出力は```jsonから始まります
 
@@ -64,7 +72,7 @@ GENERATE_JOB_TEXT = """
     "job_type": "ソフトウェアエンジニア",
     "job_summary": "当社の開発チームで、Webアプリケーションの開発を担当していただくエンジニアを募集しています。",
     "job_details": "ReactやAngularを使ったフロントエンド開発、PHPやRuby on Railsを使ったバックエンド開発、データベース設計やデータベースの最適化、AWSのクラウド環境の構築、運用・保守、プロジェクトマネジメントなど、幅広い業務をお任せします。開発環境は個人の希望に合わせて調整可能です。",
-    "monthly_salary": "350000",
+    "monthly_salary": 350000,
     "location": "東京都千代田区"
 }}
 ```
@@ -118,15 +126,15 @@ def main():
         "環境・エネルギー関連職",
     ]
     for job in job_list:
-        for i in range(1):
+        for i in range(10):
             try:
-                # print(f"[INFO] {i}回目 職種名: {job}")
+                print(f"[INFO] {i}回目 職種名: {job}")
                 job_text = generate_job_text(job)
                 print(f"[INFO] job_text: {job_text}")
                 job_query = job_text.split("```json")[1].strip().strip("```").strip()
                 print(f"[INFO] job_query: {job_query}")
-                # res = create_jobs(index="jobs", body=job_query)
-                # print(f"[INFO] res: {res}")
+                res = os_client.index(index="jobs", body=job_query)
+                print(f"[INFO] res: {res}")
             except BaseException as e:
                 print(f"[ERROR] {e}")
 
