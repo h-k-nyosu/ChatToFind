@@ -1,9 +1,12 @@
 from typing import List
-from app.models import Job
 from sqlalchemy import or_, desc, asc
 from sqlalchemy.orm import Session
+from elasticsearch_dsl import Search, Q
 
 from abc import ABC, abstractmethod
+
+from app.models import Job
+from app.database.opensearch import os_client
 
 
 class BaseQueries(ABC):
@@ -56,3 +59,45 @@ class PostgresQueries(BaseQueries):
             query = query.filter(Job.monthly_salary <= query_params["max_salary"])
 
         return query.all()
+
+
+class OpensearchQueries(BaseQueries):
+    def __init__(self):
+        self.client = os_client
+
+    def get_job(self, job_id: int):
+        search = Search(using=self.client, index="jobs").filter("term", id=job_id)
+        response = search.execute()
+        return response.hits[0] if response.hits else None
+
+    def get_jobs(self):
+        search = Search(using=self.client, index="jobs")
+        response = search.execute()
+        return response.hits
+
+    def get_custom_jobs(self, query_params: dict):
+        search = Search(using=self.client, index="jobs")
+
+        if "keyword" in query_params:
+            keyword = query_params["keyword"]
+            search = search.query(
+                "multi_match",
+                query=keyword,
+                fields=[
+                    "title^3",
+                    "job_type",
+                    "job_summary",
+                    "job_details",
+                    "location",
+                ],
+                type="best_fields",
+                tie_breaker=0.3,
+            )
+
+        if "min_salary" in query_params:
+            search = search.filter(
+                "range", monthly_salary={"gte": query_params["min_salary"]}
+            )
+
+        response = search.execute()
+        return response.hits
