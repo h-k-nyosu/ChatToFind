@@ -1,5 +1,6 @@
 export function sendUserMessage(message) {
-  responseAiMessage(message);
+  const response = responseAiMessage(message);
+  return response;
 }
 
 const chatMessages = document.getElementById("chat-messages");
@@ -51,22 +52,38 @@ function responseAiMessage(message) {
   );
   console.log("question-stream start");
 
-  source.onmessage = function (event) {
-    const aiMessageP = aiMessage.querySelector("p");
+  // Promiseを返すように変更
+  return new Promise((resolve) => {
+    source.onmessage = function (event) {
+      const aiMessageP = aiMessage.querySelector("p");
 
-    if (event.data.trim() === "END") {
-      source.close();
-      console.log("question-stream finish");
-    } else {
-      console.log("aiMessageP: " + `${event.data}`);
-      aiMessageP.innerText += `${event.data}`;
-      scrollToBottom();
-      console.log("chatMessages.append(" + `${event.data}` + ")");
-    }
-  };
+      if (event.data.trim() === "END") {
+        source.close();
+        console.log("question-stream finish");
+        displayLoadingIcon();
+        resolve(aiMessageP.innerText);
+      } else {
+        aiMessageP.innerText += `${event.data}`;
+        scrollToBottom();
+      }
+    };
+  });
 }
 
 function scrollToBottom() {
   const chatMessages = document.querySelector(".chat-messages");
   chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function displayLoadingIcon() {
+  const chatMessages = document.getElementById("chat-messages");
+  const loadingIcon = document.createElement("div");
+  loadingIcon.innerHTML = `
+    <img
+      src="/static/images/loading.gif"
+      alt="Loading"
+      class="loading-icon"
+    />
+  `;
+  chatMessages.appendChild(loadingIcon);
 }

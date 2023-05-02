@@ -1,18 +1,26 @@
-export function fetchSearchItems(message) {
+export async function fetchSearchItems(message) {
   console.log("fetchSearchItems start");
-  fetch(`/search-items?message=${encodeURIComponent(message)}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Error fetching search items");
-      }
-      return response.json();
-    })
-    .then((searchResults) => {
-      renderMainContent(searchResults);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  try {
+    const response = await fetch(
+      `/search-items?message=${encodeURIComponent(message)}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Error fetching search items");
+    }
+
+    const searchResults = await response.json();
+    if (!searchResults) {
+      removeLoadingIcon();
+      console.log("fetchSearchItems finish because no hits.");
+      return;
+    }
+    removeLoadingIcon();
+    renderMainContent(searchResults);
+    console.log("fetchSearchItems finish");
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function renderItem(job) {
@@ -48,4 +56,12 @@ function renderSearchResult(searchResult) {
 function renderMainContent(searchResults) {
   const mainContent = document.querySelector(".main-content");
   mainContent.innerHTML = searchResults.map(renderSearchResult).join("");
+}
+
+function removeLoadingIcon() {
+  const chatMessages = document.getElementById("chat-messages");
+  const loadingIcon = chatMessages.querySelector(".loading-icon");
+  if (loadingIcon) {
+    chatMessages.removeChild(loadingIcon.parentNode);
+  }
 }

@@ -171,6 +171,12 @@ a {
   padding: 20px;
 }
 
+.loading-icon {
+  width: 30px;
+  height: 30px;
+  margin-left: 10%;
+}
+
 #chat-form {
   display: flex;
   padding: 20px;
@@ -198,6 +204,12 @@ button[type="submit"] {
 
 button[type="submit"]:hover {
   background-color: #3700b3;
+}
+
+button[type="submit"]:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
 }
 
 .user-message-container,
