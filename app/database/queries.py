@@ -1,4 +1,4 @@
-from opensearch_dsl import Search
+from opensearch_dsl import Search, Q
 
 from abc import ABC, abstractmethod
 
@@ -42,7 +42,7 @@ class OpensearchQueries(BaseQueries):
     def get_custom_jobs(self, query_params: dict):
         search = Search(using=self.client, index="jobs")
 
-        if "keyword" in query_params:
+        if "keyword" in query_params and query_params["keyword"]:
             keyword = query_params["keyword"]
             search = search.query(
                 "multi_match",
@@ -56,12 +56,29 @@ class OpensearchQueries(BaseQueries):
                 ],
                 type="best_fields",
                 tie_breaker=0.3,
+                fuzziness="AUTO",
             )
 
-        if "min_salary" in query_params:
+        if "location" in query_params and query_params["location"]:
+            if isinstance(query_params["location"], list):
+                location_queries = [
+                    Q("match_phrase_prefix", location=loc)
+                    for loc in query_params["location"]
+                ]
+                search = search.query(
+                    "bool", should=location_queries, minimum_should_match=1
+                )
+            else:
+                search = search.query(
+                    "match_phrase_prefix", location=query_params["location"]
+                )
+
+        if "min_salary" in query_params and query_params["min_salary"]:
             search = search.filter(
                 "range", monthly_salary={"gte": query_params["min_salary"]}
             )
+
+        print("Final Opensearch query: ", search.to_dict())
 
         response = search.execute()
         return [self._transform_hit_to_job(hit) for hit in response.hits]
