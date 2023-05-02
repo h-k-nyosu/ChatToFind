@@ -134,7 +134,7 @@ def main():
                 print(f"[INFO] job_text: {job_text}")
                 job_query = job_text.split("```json")[1].strip().strip("```").strip()
                 print(f"[INFO] job_query: {job_query}")
-                res = os_client.index(index="jobs_test", body=job_query)
+                res = os_client.index(index="jobs", body=job_query)
                 print(f"[INFO] res: {res}")
             except BaseException as e:
                 print(f"[ERROR] {e}")
