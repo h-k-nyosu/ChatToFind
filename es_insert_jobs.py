@@ -88,6 +88,7 @@ def generate_job_text(job_type):
             {"role": "user", "content": f"職種： {job_type}"},
         ],
         max_tokens=2000,
+        temperature=1.3,
     )
     job_text = f"職種名\n{job_type}"
     job_text += response["choices"][0]["message"]["content"]
@@ -96,12 +97,12 @@ def generate_job_text(job_type):
 
 def main():
     job_list = [
-        "ソフトウェアエンジニア",
-        "グラフィックデザイナー",
+        "エンジニア",
+        "デザイナー",
         "データアナリスト",
         "プロジェクトマネージャー",
         "ウェブデザイナー",
-        "マーケティングスペシャリスト",
+        "マーケター",
         "広報・PR担当",
         "人事担当",
         "経理・財務担当",
@@ -128,12 +129,12 @@ def main():
     for job in job_list:
         for i in range(10):
             try:
-                print(f"[INFO] {i}回目 職種名: {job}")
+                print(f"[INFO] {i+1}回目 職種名: {job}")
                 job_text = generate_job_text(job)
                 print(f"[INFO] job_text: {job_text}")
                 job_query = job_text.split("```json")[1].strip().strip("```").strip()
                 print(f"[INFO] job_query: {job_query}")
-                res = os_client.index(index="jobs", body=job_query)
+                res = os_client.index(index="jobs_test", body=job_query)
                 print(f"[INFO] res: {res}")
             except BaseException as e:
                 print(f"[ERROR] {e}")
