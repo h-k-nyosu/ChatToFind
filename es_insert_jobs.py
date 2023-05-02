@@ -44,7 +44,7 @@ os_client = OpenSearch(
 
 
 GENERATE_JOB_TEXT = """
-与えられた職種の求人原稿について、以下の項目で1000字程度で記載してください。
+与えられた職業の求人原稿について、以下の項目で1000字程度で記載してください。
 
 ## 制約条件
 ・内容は実際にありそうな具体的なものにしてください。実在しなくても可。
@@ -85,12 +85,12 @@ def generate_job_text(job_type):
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": f"{prompt}"},
-            {"role": "user", "content": f"職種： {job_type}"},
+            {"role": "user", "content": f"職業： {job_type}"},
         ],
         max_tokens=2000,
         temperature=1.3,
     )
-    job_text = f"職種名\n{job_type}"
+    job_text = f"職業\n{job_type}"
     job_text += response["choices"][0]["message"]["content"]
     return job_text
 
