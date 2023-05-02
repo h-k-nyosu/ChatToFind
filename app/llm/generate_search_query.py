@@ -10,44 +10,48 @@ GENERATE_SEARCH_QUERY_PROMPT = """
 ・search_queryはスキーマに従うこと
 ・3件の検索クエリを生成すること
 ・titleには検索を一言で表す言葉を生成すること。最終的に`[title]の求人`として出力されます
+・nullや空文字は記載してはいけません
 
-## スキーマ
-class JobQueryParams:
-    keyword: Optional[str] = None
-    location: Optional[str] = None
-    min_salary: Optional[int] = None
+schema = {
+    "title": {"type": "string"},
+    "search_query": {
+        "keyword": {"type": "string"},
+        "location": {"type": "string"}, # Optional
+        "min_salary": {"type": "number"} # Optional
+    }
+}
 
 ## 出力結果例
 1件目
 ```json
-{{
+{
     "title": "ソフトウェアエンジニア",
     "search_query": {
         "keyword": "ソフトウェアエンジニア",
         "location": "東京",
         "min_salary": 200000,
     }
-}}
+}
 ```
 
 2件目
 ```json
-{{
+{
     "title": "データサイエンティスト",
     "search_query": {
         "keyword": "データサイエンティスト"
     }
-}}
+}
 ```
 
 3件目
 ```json
-{{
+{
     "title": "販売スタッフ",
     "search_query": {
         "keyword": "販売スタッフ"
     }
-}}
+}
 ```
 
 """
