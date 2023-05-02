@@ -12,6 +12,7 @@ function createMessageComponent(user, imgSrc, messageText) {
   const messageAvatar = document.createElement("div");
   messageAvatar.classList.add(user + "-message-avatar");
   const avatarImg = document.createElement("img");
+  avatarImg.classList.add(user + "-icon-avatar");
   avatarImg.src = imgSrc;
   avatarImg.alt = user + " avatar";
   messageAvatar.appendChild(avatarImg);
@@ -35,16 +36,12 @@ function responseAiMessage(message) {
 
   const userMessage = createMessageComponent(
     "user",
-    "https://cdn-icons-png.flaticon.com/512/1077/1077114.png",
+    "/static/images/thinking.svg",
     message
   );
   chatMessages.appendChild(userMessage);
 
-  const aiMessage = createMessageComponent(
-    "ai",
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/ChatGPT_logo.svg/1200px-ChatGPT_logo.svg.png",
-    ""
-  );
+  const aiMessage = createMessageComponent("ai", "/static/images/star.svg", "");
   chatMessages.appendChild(aiMessage);
 
   const source = new EventSource(
