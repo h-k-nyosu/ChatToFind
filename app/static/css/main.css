@@ -200,6 +200,12 @@ button[type="submit"]:hover {
   background-color: #3700b3;
 }
 
+button[type="submit"]:disabled {
+  background-color: #cccccc;
+  color: #666666;
+  cursor: not-allowed;
+}
+
 .user-message-container,
 .ai-message-container {
   display: flex;

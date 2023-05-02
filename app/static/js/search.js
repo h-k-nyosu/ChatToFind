@@ -1,18 +1,19 @@
-export function fetchSearchItems(message) {
+export async function fetchSearchItems(message) {
   console.log("fetchSearchItems start");
-  fetch(`/search-items?message=${encodeURIComponent(message)}`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Error fetching search items");
-      }
-      return response.json();
-    })
-    .then((searchResults) => {
-      renderMainContent(searchResults);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
+  try {
+    const response = await fetch(
+      `/search-items?message=${encodeURIComponent(message)}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Error fetching search items");
+    }
+
+    const searchResults = await response.json();
+    renderMainContent(searchResults);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function renderItem(job) {
