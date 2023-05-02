@@ -8,10 +8,13 @@ const submitButton = document.getElementById("submit-button");
 chatForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (chatInput.value !== "") {
+    const userMessage = chatInput.value;
     submitButton.disabled = true;
-    sendUserMessage(chatInput.value);
-    await fetchSearchItems(chatInput.value);
-    submitButton.disabled = false;
     chatInput.value = "";
+    const aiMessage = await sendUserMessage(userMessage);
+
+    await fetchSearchItems(aiMessage);
+    submitButton.disabled = false;
+    console.log("main finish");
   }
 });

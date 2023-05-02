@@ -10,7 +10,14 @@ export async function fetchSearchItems(message) {
     }
 
     const searchResults = await response.json();
+    if (!searchResults) {
+      removeLoadingIcon();
+      console.log("fetchSearchItems finish because no hits.");
+      return;
+    }
+    removeLoadingIcon();
     renderMainContent(searchResults);
+    console.log("fetchSearchItems finish");
   } catch (error) {
     console.error(error);
   }
@@ -49,4 +56,12 @@ function renderSearchResult(searchResult) {
 function renderMainContent(searchResults) {
   const mainContent = document.querySelector(".main-content");
   mainContent.innerHTML = searchResults.map(renderSearchResult).join("");
+}
+
+function removeLoadingIcon() {
+  const chatMessages = document.getElementById("chat-messages");
+  const loadingIcon = chatMessages.querySelector(".loading-icon");
+  if (loadingIcon) {
+    chatMessages.removeChild(loadingIcon.parentNode);
+  }
 }

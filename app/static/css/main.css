@@ -171,6 +171,12 @@ a {
   padding: 20px;
 }
 
+.loading-icon {
+  width: 30px;
+  height: 30px;
+  margin-left: 10%;
+}
+
 #chat-form {
   display: flex;
   padding: 20px;
