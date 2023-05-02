@@ -16,8 +16,8 @@ schema = {
     "title": {"type": "string"},
     "search_query": {
         "keyword": {"type": "string"},
-        "location": {"type": "string"}, # Optional
-        "min_salary": {"type": "number"} # Optional
+        "location": {"type": "string"},
+        "min_salary": {"type": "number"}
     }
 }
 
