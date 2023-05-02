@@ -1,3 +1,4 @@
+import traceback
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -49,27 +50,32 @@ async def stream_chat_response(message: str):
 
 @app.get("/search-items")
 async def get_search_items(message: str):
-    print(f"message: {message}")
-    search_query_str = await generate_search_query(message)
+    try:
+        print(f"message: {message}")
+        search_query_str = await generate_search_query(message)
 
-    print(f"search_query_str: {search_query_str}")
-    search_query_list = parse_json(search_query_str)
+        print(f"search_query_str: {search_query_str}")
+        search_query_list = parse_json(search_query_str)
 
-    print(f"search_query_list: {search_query_list}")
-    if not search_query_list:
+        print(f"search_query_list: {search_query_list}")
+        if not search_query_list:
+            return
+
+        response = []
+        for search_query in search_query_list:
+            print(f"search_query: {search_query['search_query']}")
+            search_results = opensearch_queries.get_custom_jobs(
+                query_params=search_query["search_query"]
+            )
+            response.append(
+                {"title": search_query["title"], "search_results": search_results}
+            )
+        print(f"response: {response}")
+        return response
+    except BaseException as e:
+        print(f"[ERROR] {e}")
+        traceback.print_exc()
         return
-
-    response = []
-    for search_query in search_query_list:
-        print(f"search_query: {search_query['search_query']}")
-        search_results = opensearch_queries.get_custom_jobs(
-            query_params=search_query["search_query"]
-        )
-        response.append(
-            {"title": search_query["title"], "search_results": search_results}
-        )
-    print(f"response: {response}")
-    return response
 
 
 if __name__ == "__main__":
