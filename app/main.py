@@ -60,9 +60,7 @@ async def get_search_items(message: str):
     try:
         print(f"message: {message}")
         search_required = await is_required_search(message)
-        print(f"{search_required}")
         if not search_required:
-            print("return: {search_required}")
             return
 
         search_query_str = await generate_search_query(message)
