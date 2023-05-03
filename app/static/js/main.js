@@ -14,7 +14,7 @@ chatForm.addEventListener("submit", async (event) => {
     chatInput.value = "";
     const aiMessage = await sendUserMessage(userMessage, sessionId);
 
-    await fetchSearchItems(aiMessage);
+    await fetchSearchItems(aiMessage, sessionId);
     submitButton.disabled = false;
     console.log("main finish");
   }
