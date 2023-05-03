@@ -8,7 +8,7 @@ from fastapi.responses import StreamingResponse
 from app.llm.chat import generate_chat_response
 from app.llm.generate_search_query import generate_search_query
 from app.database.queries import OpensearchQueries
-from app.utils import parse_json
+from app.utils.parse_json import parse_json
 
 app = FastAPI()
 
