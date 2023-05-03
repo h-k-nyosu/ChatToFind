@@ -41,7 +41,11 @@ function responseAiMessage(message, sessionId) {
   );
   chatMessages.appendChild(userMessage);
 
-  const aiMessage = createMessageComponent("ai", "/static/images/star.svg", "");
+  const aiMessage = createMessageComponent(
+    "ai",
+    "/static/images/woman-agent.svg",
+    ""
+  );
   chatMessages.appendChild(aiMessage);
 
   const source = new EventSource(
