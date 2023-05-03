@@ -1,4 +1,5 @@
 import traceback
+import uuid
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -20,12 +21,14 @@ opensearch_queries = OpensearchQueries()
 
 @app.get("/")
 async def index(request: Request):
+    session_id = str(uuid.uuid4())
     jobs = opensearch_queries.get_jobs()
     jobs_per_row = 30
     job_rows = [jobs[i : i + jobs_per_row] for i in range(0, len(jobs), jobs_per_row)]
 
     return templates.TemplateResponse(
-        "index.html", {"request": request, "job_rows": job_rows}
+        "index.html",
+        {"request": request, "job_rows": job_rows, "session_id": session_id},
     )
 
 
@@ -40,9 +43,10 @@ async def job_detail(job_id: str, request: Request):
 
 
 @app.get("/question-stream")
-async def stream_chat_response(message: str):
+async def stream_chat_response(message: str, session_id: str):
     if not message:
         return
+    print(f"session_id: {session_id}")
     return StreamingResponse(
         generate_chat_response(message), media_type="text/event-stream"
     )

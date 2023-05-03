@@ -1,5 +1,5 @@
-export function sendUserMessage(message) {
-  const response = responseAiMessage(message);
+export function sendUserMessage(message, sessionId) {
+  const response = responseAiMessage(message, sessionId);
   return response;
 }
 
@@ -29,7 +29,7 @@ function createMessageComponent(user, imgSrc, messageText) {
   return messageContainer;
 }
 
-function responseAiMessage(message) {
+function responseAiMessage(message, sessionId) {
   if (message.trim() === "END") {
     return;
   }
@@ -45,7 +45,9 @@ function responseAiMessage(message) {
   chatMessages.appendChild(aiMessage);
 
   const source = new EventSource(
-    `/question-stream?message=${encodeURIComponent(message)}`
+    `/question-stream?message=${encodeURIComponent(
+      message
+    )}&session_id=${encodeURIComponent(sessionId)}`
   );
   console.log("question-stream start");
 
