@@ -48,13 +48,13 @@ class OpensearchQueries(BaseQueries):
                 "multi_match",
                 query=keyword,
                 fields=[
-                    "title^3",
+                    "title",
                     "job_type",
                     "job_summary",
                     "job_details",
                     "location",
                 ],
-                type="best_fields",
+                type="most_fields",
                 tie_breaker=0.3,
                 fuzziness="AUTO",
             )
