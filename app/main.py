@@ -9,6 +9,7 @@ from app.llm.chat import generate_chat_response
 from app.llm.generate_search_query import generate_search_query
 from app.database.queries import OpensearchQueries
 from app.utils.parse_json import parse_json
+from app.utils.conversation_history import ConversationHistory
 
 app = FastAPI()
 
@@ -17,6 +18,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 opensearch_queries = OpensearchQueries()
+conversation_history = ConversationHistory()
 
 
 @app.get("/")
@@ -46,9 +48,9 @@ async def job_detail(job_id: str, request: Request):
 async def stream_chat_response(message: str, session_id: str):
     if not message:
         return
-    print(f"session_id: {session_id}")
     return StreamingResponse(
-        generate_chat_response(message), media_type="text/event-stream"
+        generate_chat_response(message, session_id, conversation_history),
+        media_type="text/event-stream",
     )
 
 
