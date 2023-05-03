@@ -1,13 +1,16 @@
+import asyncio
 import traceback
+import uuid
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 
 from app.llm.chat import generate_chat_response
-from app.llm.generate_search_query import generate_search_query
+from app.llm.generate_search_query import generate_search_query, is_required_search
 from app.database.queries import OpensearchQueries
-from app.utils import parse_json
+from app.utils.parse_json import parse_json
+from app.utils.conversation_history import ConversationHistory
 
 app = FastAPI()
 
@@ -16,16 +19,19 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 opensearch_queries = OpensearchQueries()
+conversation_history = ConversationHistory()
 
 
 @app.get("/")
 async def index(request: Request):
+    session_id = str(uuid.uuid4())
     jobs = opensearch_queries.get_jobs()
     jobs_per_row = 30
     job_rows = [jobs[i : i + jobs_per_row] for i in range(0, len(jobs), jobs_per_row)]
 
     return templates.TemplateResponse(
-        "index.html", {"request": request, "job_rows": job_rows}
+        "index.html",
+        {"request": request, "job_rows": job_rows, "session_id": session_id},
     )
 
 
@@ -40,11 +46,12 @@ async def job_detail(job_id: str, request: Request):
 
 
 @app.get("/question-stream")
-async def stream_chat_response(message: str):
+async def stream_chat_response(message: str, session_id: str):
     if not message:
         return
     return StreamingResponse(
-        generate_chat_response(message), media_type="text/event-stream"
+        generate_chat_response(message, session_id, conversation_history),
+        media_type="text/event-stream",
     )
 
 
@@ -52,6 +59,10 @@ async def stream_chat_response(message: str):
 async def get_search_items(message: str):
     try:
         print(f"message: {message}")
+        search_required = await is_required_search(message)
+        if not search_required:
+            return
+
         search_query_str = await generate_search_query(message)
 
         print(f"search_query_str: {search_query_str}")
@@ -77,6 +88,22 @@ async def get_search_items(message: str):
         traceback.print_exc()
         return
 
+
+# 非同期でremove_expired_sessionsを実行する関数
+async def remove_expired_sessions_async():
+    while True:
+        await asyncio.sleep(60 * 60 * 24)  # 1日（24時間）待機
+        conversation_history.remove_expired_sessions()
+
+
+# バックグラウンドタスクを開始する関数
+def start_remove_expired_sessions_task():
+    loop = asyncio.get_event_loop()
+    loop.create_task(remove_expired_sessions_async())
+
+
+# タスクを開始
+start_remove_expired_sessions_task()
 
 if __name__ == "__main__":
     import uvicorn
