@@ -1,3 +1,4 @@
+import asyncio
 import traceback
 import uuid
 from fastapi import FastAPI, Request, HTTPException
@@ -83,6 +84,22 @@ async def get_search_items(message: str):
         traceback.print_exc()
         return
 
+
+# 非同期でremove_expired_sessionsを実行する関数
+async def remove_expired_sessions_async():
+    while True:
+        await asyncio.sleep(60 * 60 * 24)  # 1日（24時間）待機
+        conversation_history.remove_expired_sessions()
+
+
+# バックグラウンドタスクを開始する関数
+def start_remove_expired_sessions_task():
+    loop = asyncio.get_event_loop()
+    loop.create_task(remove_expired_sessions_async())
+
+
+# タスクを開始
+start_remove_expired_sessions_task()
 
 if __name__ == "__main__":
     import uvicorn
