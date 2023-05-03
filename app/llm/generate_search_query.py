@@ -53,8 +53,50 @@ schema = {
     }
 }
 ```
-
 """
+
+IS_REQUIRED_SEARCH_SYSTEM_MESSAGE = """
+## 前提
+- あなたは与えられた文章から求人検索をする必要があるかをTrue/Falseで出力するAIです
+- ユーザーから希望条件をヒアリングするAIの生成文章が与えられます
+- 出力例に従ってTrue/Falseのみを生成します
+
+##出力例
+INPUT:こんにちは！どのようなことでお悩みですか？
+OUTPUT:False
+
+INPUT:はい、エンジニアの求人は多くありますよ！お持ちのスキルや経験に合わせて、検索条件を絞ることができます。何か特定のエンジニア業界に興味がありますか？
+OUTPUT:False
+
+INPUT:なるほど、Pythonを使ったバックエンド開発の求人をお探しですね。東京での勤務を希望されるとのことでしたので、条件に合う求人をお探しいたします。少々お待ちください。
+OUTPUT:True
+"""
+
+IS_REQUIRED_SEARCH_AI_MESSAGE = """
+INPUT:{input}
+OUTPUT:
+"""
+
+
+async def is_required_search(text):
+    openai.api_key = OPENAI_API_KEY
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": f"{IS_REQUIRED_SEARCH_SYSTEM_MESSAGE}"},
+            {
+                "role": "user",
+                "content": f"{IS_REQUIRED_SEARCH_AI_MESSAGE.format(input=text)}",
+            },
+        ],
+        max_tokens=30,
+    )
+
+    search_is_required = "true" in response["choices"][0]["message"]["content"].lower()
+    print(f'response: {response["choices"][0]["message"]["content"]}')
+    print(f"検索すべきか: {search_is_required}")
+    return search_is_required
 
 
 async def generate_search_query(text):

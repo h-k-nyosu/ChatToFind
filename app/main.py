@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 
 from app.llm.chat import generate_chat_response
-from app.llm.generate_search_query import generate_search_query
+from app.llm.generate_search_query import generate_search_query, is_required_search
 from app.database.queries import OpensearchQueries
 from app.utils.parse_json import parse_json
 from app.utils.conversation_history import ConversationHistory
@@ -59,6 +59,12 @@ async def stream_chat_response(message: str, session_id: str):
 async def get_search_items(message: str):
     try:
         print(f"message: {message}")
+        search_required = await is_required_search(message)
+        print(f"{search_required}")
+        if not search_required:
+            print("return: {search_required}")
+            return
+
         search_query_str = await generate_search_query(message)
 
         print(f"search_query_str: {search_query_str}")
