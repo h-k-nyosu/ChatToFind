@@ -56,13 +56,12 @@ async def stream_chat_response(message: str, session_id: str):
 
 
 @app.get("/search-items")
-async def get_search_items(message: str):
+async def get_search_items(message: str, session_id: str):
     try:
-        print(f"message: {message}")
+        message = f"## 過去の会話:\n{conversation_history.format_recent_conversations(session_id=session_id)}\n## 最新のAIの回答\n{message}"
         search_required = await is_required_search(message)
         if not search_required:
             return
-
         search_query_str = await generate_search_query(message)
 
         print(f"search_query_str: {search_query_str}")

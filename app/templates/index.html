@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/main.css" />
-    <title>チャット求人検索</title>
+    <link rel="icon" href="/static/images/woman-agent.svg" type="image/svg+xml">
+    <title>チャットで求人探し</title>
   </head>
   <body>
     <div class="main-content">
@@ -37,12 +38,12 @@
                 <img src="/static/images/woman-agent.svg" alt="ai avatar" class="ai-icon-avatar">
             </div>
             <div class="ai-message-content">
-                <p>こんにちは、転職エージェントAIです。転職に関するご相談があれば、お聞かせください。どのようなことでお悩みですか？</p>
+                <p>こんにちは！私は求人探しサポートAIです。あなたの理想の仕事を見つけるお手伝いをさせてください。まずは、どんな職種や業界に興味がありますか？</p>
             </div>
           </div>
         </div>
         <form id="chat-form">
-          <input type="text" placeholder="エンジニアの仕事を探しています" id="chat-input" />
+          <input type="text" placeholder="希望の職種、勤務地、給与など、お探しの条件を入力" id="chat-input" />
           <input type="hidden" id="session-id" value="{{ session_id }}">
           <button type="submit" id="submit-button">送信</button>
         </form>

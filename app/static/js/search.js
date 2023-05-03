@@ -1,8 +1,10 @@
-export async function fetchSearchItems(message) {
+export async function fetchSearchItems(message, sessionId) {
   console.log("fetchSearchItems start");
   try {
     const response = await fetch(
-      `/search-items?message=${encodeURIComponent(message)}`
+      `/search-items?message=${encodeURIComponent(
+        message
+      )}&session_id=${encodeURIComponent(sessionId)}`
     );
 
     if (!response.ok) {

@@ -8,38 +8,38 @@ IS_REQUIRED_SEARCH_SYSTEM_MESSAGE = """
 - 出力例に従ってTrue/Falseのみを生成します
 
 ##出力例
-INPUT:こんにちは！どのようなことでお悩みですか？
+直近の会話:こんにちは！どのようなことでお悩みですか？
 OUTPUT:False
 
-INPUT:はい、エンジニアの求人は多くありますよ！お持ちのスキルや経験に合わせて、検索条件を絞ることができます。何か特定のエンジニア業界に興味がありますか？
+直近の会話:はい、エンジニアの求人は多くありますよ！お持ちのスキルや経験に合わせて、検索条件を絞ることができます。何か特定のエンジニア業界に興味がありますか？
 OUTPUT:False
 
-INPUT:なるほど、Pythonを使ったバックエンド開発の求人をお探しですね。東京での勤務を希望されるとのことでしたので、条件に合う求人をお探しいたします。少々お待ちください。
+直近の会話:なるほど、Pythonを使ったバックエンド開発の求人をお探しですね。東京での勤務を希望されるとのことでしたので、条件に合う求人をお探しいたします。少々お待ちください。
 OUTPUT:True
 
-INPUT:了解です。リモートワーク可能なマーケティングの求人も探してみますね。ただし、都内での勤務も考えていただけると幅が広がります。
+直近の会話:了解です。リモートワーク可能なマーケティングの求人も探してみますね。ただし、都内での勤務も考えていただけると幅が広がります。
 OUTPUT:True
 
-INPUT:了解です。Web開発のフルスタックエンジニアとしての求人を探してみますね。
+直近の会話:了解です。Web開発のフルスタックエンジニアとしての求人を探してみますね。
 OUTPUT:True
 """
 
 IS_REQUIRED_SEARCH_USER_MESSAGE = """
-INPUT:{input}
+{input}
 OUTPUT:
 """
 
 
-async def is_required_search(text):
+async def is_required_search(message):
     openai.api_key = OPENAI_API_KEY
-
+    print(f"{IS_REQUIRED_SEARCH_USER_MESSAGE.format(input=message)}")
     response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": f"{IS_REQUIRED_SEARCH_SYSTEM_MESSAGE}"},
             {
                 "role": "user",
-                "content": f"{IS_REQUIRED_SEARCH_USER_MESSAGE.format(input=text)}",
+                "content": f"{IS_REQUIRED_SEARCH_USER_MESSAGE.format(input=message)}",
             },
         ],
         max_tokens=30,
@@ -52,28 +52,28 @@ async def is_required_search(text):
 
 
 GENERATE_SEARCH_QUERY_SYSTEM_MESSAGE = """
-## 前提
-- あなたは求人を探すための検索クエリをJSONで生成するAIです
-- ユーザーとの会話はチャットAIが行なっています
-- あなたはチャットAIがレスポンスをした文章をもとに適切な検索クエリを生成します
+## Premise
+- You are an AI that generates search queries for job listings in JSON format.
+- The user's conversation is handled by a chat AI.
+- You generate appropriate search queries based on the text that the chat AI has responded with.
 
-## 制約条件
-- 出力形式のようなJSONを生成します。```jsonで回答を始めてください
-- search_queryはスキーマを参考にしてください（ただしlocation, min_salaryは任意項目です）
-- 3件の検索クエリを生成すること
+## Constraints
+- Generate JSON in the output format shown below. Start your response with ```json.
+- Refer to the schema for the search_query (however, location and min_salary are optional fields).
+- Generate 3 search queries.
+- Answer all questions in Japanese. lang:ja
 
-
-## スキーマ
+## Schema
 {
-    "title": {"type": "string"},
-    "search_query": {
-        "keyword": {"type": "string"},
-        "location": {"type": "string"},
-        "min_salary": {"type": "number"}
-    }
+"title": {"type": "string"},
+"search_query": {
+"keyword": {"type": "string"},
+"location": {"type": "string"},
+"min_salary": {"type": "number"}
+}
 }
 
-## 出力形式
+## Output Format
 ```json
 {
     "1": {
@@ -101,10 +101,10 @@ GENERATE_SEARCH_QUERY_SYSTEM_MESSAGE = """
 """
 
 GENERATE_SEARCH_QUERY_USER_MESSAGE = """
-## AIチャットによる回答
+## response by Chat AI
 {message}
 
-## それを踏まえたJSON形式の出力
+## Output
 """
 
 
