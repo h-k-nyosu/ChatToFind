@@ -115,7 +115,7 @@ def main():
     ]
     # 求人データの生成とインサートのプロセス
     for job in job_list:
-        for i in range(3):
+        for i in range(10):
             try:
                 print(f"[INFO] {i+1}回目 職種名: {job}")
                 job_text = generate_job_text(job)
@@ -129,7 +129,7 @@ def main():
 
                 # Pineconeインデックスにアップサート
                 job_id = f"{uuid.uuid4()}"
-                index.upsert([(job_id, embed, {"content": job_text})])
+                index.upsert([(job_id, embed, {"content": job_data})])
 
             except BaseException as e:
                 print(f"[ERROR] {e}")
