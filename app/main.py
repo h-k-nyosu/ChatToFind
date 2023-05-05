@@ -22,7 +22,7 @@ opensearch_queries = OpensearchQueries()
 conversation_history = ConversationHistory()
 
 
-@app.get("/")
+@app.get("/opensearch/")
 async def index(request: Request):
     session_id = str(uuid.uuid4())
     jobs = opensearch_queries.get_jobs()
@@ -35,13 +35,36 @@ async def index(request: Request):
     )
 
 
-@app.get("/jobs/{job_id}")
+@app.get("/opensearch/jobs/{job_id}")
 async def job_detail(job_id: str, request: Request):
     job = opensearch_queries.get_job(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return templates.TemplateResponse(
         "job_detail.html", {"request": request, "job": job}
+    )
+
+
+@app.get("/pinecone/")
+async def pinecone_index(request: Request):
+    session_id = str(uuid.uuid4())
+    jobs = opensearch_queries.get_jobs()
+    jobs_per_row = 30
+    job_rows = [jobs[i : i + jobs_per_row] for i in range(0, len(jobs), jobs_per_row)]
+
+    return templates.TemplateResponse(
+        "pinecone_jobs.html",
+        {"request": request, "job_rows": job_rows, "session_id": session_id},
+    )
+
+
+@app.get("/pinecone/jobs/{job_id}")
+async def job_detail(job_id: str, request: Request):
+    job = opensearch_queries.get_job(job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return templates.TemplateResponse(
+        "pinecone_job_detail.html", {"request": request, "job": job}
     )
 
 
@@ -55,7 +78,40 @@ async def stream_chat_response(message: str, session_id: str):
     )
 
 
-@app.get("/search-items")
+@app.get("/opensearch/search-items")
+async def get_search_items(message: str, session_id: str):
+    try:
+        message = f"## 過去の会話:\n{conversation_history.format_recent_conversations(session_id=session_id)}\n## 最新のAIの回答\n{message}"
+        search_required = await is_required_search(message)
+        if not search_required:
+            return
+        search_query_str = await generate_search_query(message)
+
+        print(f"search_query_str: {search_query_str}")
+        search_query_list = parse_json(search_query_str)
+
+        print(f"search_query_list: {search_query_list}")
+        if not search_query_list:
+            return
+
+        response = []
+        for search_query in search_query_list:
+            print(f"search_query: {search_query['search_query']}")
+            search_results = opensearch_queries.get_custom_jobs(
+                query_params=search_query["search_query"]
+            )
+            response.append(
+                {"title": search_query["title"], "search_results": search_results}
+            )
+        print(f"response: {response}")
+        return response
+    except BaseException as e:
+        print(f"[ERROR] {e}")
+        traceback.print_exc()
+        return
+
+
+@app.get("/pinecone/search-items")
 async def get_search_items(message: str, session_id: str):
     try:
         message = f"## 過去の会話:\n{conversation_history.format_recent_conversations(session_id=session_id)}\n## 最新のAIの回答\n{message}"

@@ -1,8 +1,9 @@
 export async function fetchSearchItems(message, sessionId) {
   console.log("fetchSearchItems start");
   try {
+    const path = window.location.pathname;
     const response = await fetch(
-      `/search-items?message=${encodeURIComponent(
+      `${path}search-items?message=${encodeURIComponent(
         message
       )}&session_id=${encodeURIComponent(sessionId)}`
     );
