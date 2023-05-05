@@ -66,7 +66,7 @@ def generate_job_text(history):
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": f"{prompt}"},
-            {"role": "user", "content": f"{history}"},
+            {"role": "system", "content": f"過去の会話履歴: {history}"},
         ],
         max_tokens=2000,
         temperature=1.3,
@@ -92,8 +92,9 @@ AI: IT業界にはさまざまな職種があります。具体的にどのよ�
 def main():
     try:
         job_text = generate_job_text(history)
+        print(f"[INFO] job_text: {job_text}")
         job_data = job_text.split("```json")[1].strip().strip("```").strip()
-        print(f"[INFO] job_data: {job_data}")
+        # print(f"[INFO] job_data: {job_data}")
 
         # 求人データの埋め込みを計算
         res = openai.Embedding.create(input=job_data, engine=MODEL)
@@ -104,7 +105,7 @@ def main():
         for match in matches:
             metadata = match["metadata"]
             content = metadata["content"]
-            print(content)
+            print(f"{content}\n")
 
     except BaseException as e:
         print(f"[ERROR] {e}")
