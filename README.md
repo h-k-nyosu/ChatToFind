@@ -303,7 +303,7 @@ Ai:
 入力されるデータが日本語なためプロンプトを日本語にしています。精度もそこまで悪くはない印象です。
 
 ```python
-# generate_search_query.py
+# generate_query.py
 
 IS_REQUIRED_SEARCH_SYSTEM_MESSAGE = """
 ## 前提
@@ -351,7 +351,7 @@ async def is_required_search(message):
 <b>求人検索クエリの生成</b>
 
 ````python
-# generate_search_query.py
+# generate_query.py
 
 ENERATE_SEARCH_QUERY_SYSTEM_MESSAGE = """
 ## Premise
@@ -402,16 +402,16 @@ ENERATE_SEARCH_QUERY_SYSTEM_MESSAGE = """
 ```
 """
 
-async def generate_search_query(message):
+async def generate_opensearch_query(message):
     openai.api_key = OPENAI_API_KEY
 
     response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": GENERATE_SEARCH_QUERY_SYSTEM_MESSAGE},
+            {"role": "system", "content": generate_opensearch_query_SYSTEM_MESSAGE},
             {
                 "role": "user",
-                "content": GENERATE_SEARCH_QUERY_USER_MESSAGE.format(message=message),
+                "content": generate_opensearch_query_USER_MESSAGE.format(message=message),
             },
         ],
         max_tokens=3000,
