@@ -51,7 +51,7 @@ async def is_required_search(message):
     return search_is_required
 
 
-generate_opensearch_query_SYSTEM_MESSAGE = """
+GENERATE_OPENSEARCH_QUERY_SYSTEM_MESSAGE = """
 ## Premise
 - You are an AI that generates search queries for job listings in JSON format.
 - The user's conversation is handled by a chat AI.
@@ -100,12 +100,34 @@ generate_opensearch_query_SYSTEM_MESSAGE = """
 ```
 """
 
-generate_opensearch_query_USER_MESSAGE = """
+GENERATE_OPENSEARCH_QUERY_USER_MESSAGE = """
 ## response by Chat AI
-{message}
+{ai_message}
 
 ## Output
 """
+
+
+async def generate_opensearch_query(ai_message):
+    openai.api_key = OPENAI_API_KEY
+
+    response = await openai.ChatCompletion.acreate(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": GENERATE_OPENSEARCH_QUERY_SYSTEM_MESSAGE},
+            {
+                "role": "user",
+                "content": GENERATE_OPENSEARCH_QUERY_USER_MESSAGE.format(
+                    message=ai_message
+                ),
+            },
+        ],
+        max_tokens=3000,
+    )
+
+    query = response["choices"][0]["message"]["content"]
+    print(f"query: {query}")
+    return query
 
 
 async def generate_opensearch_query(message):
@@ -114,10 +136,10 @@ async def generate_opensearch_query(message):
     response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": generate_opensearch_query_SYSTEM_MESSAGE},
+            {"role": "system", "content": GENERATE_OPENSEARCH_QUERY_SYSTEM_MESSAGE},
             {
                 "role": "user",
-                "content": generate_opensearch_query_USER_MESSAGE.format(
+                "content": GENERATE_OPENSEARCH_QUERY_USER_MESSAGE.format(
                     message=message
                 ),
             },
