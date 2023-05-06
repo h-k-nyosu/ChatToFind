@@ -22,7 +22,7 @@ res = openai.Embedding.create(
 )
 
 # Pineconeのセットアップ
-pinecone.init(api_key=os.environ.get("PINCONE_API_KEY"), environment="us-east1-gcp")
+pinecone.init(api_key=os.environ.get("PINECONE_API_KEY"), environment="us-east1-gcp")
 
 # Pineconeのインデックス作成
 pinecone_index_name = "chat-to-find"

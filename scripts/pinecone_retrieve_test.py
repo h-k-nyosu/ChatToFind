@@ -2,6 +2,7 @@ import pinecone
 import os
 from dotenv import load_dotenv
 import openai
+import json
 
 load_dotenv()
 
@@ -21,7 +22,7 @@ res = openai.Embedding.create(
 )
 
 # Pineconeのセットアップ
-pinecone.init(api_key=os.environ.get("PINCONE_API_KEY"), environment="us-east1-gcp")
+pinecone.init(api_key=os.environ.get("PINECONE_API_KEY"), environment="us-east1-gcp")
 index = pinecone.Index("chat-to-find")
 
 
@@ -102,10 +103,13 @@ def main():
 
         result = index.query(vector=embed, top_k=3, include_metadata=True)
         matches = result["matches"]
+        print(f"{matches}\n")
         for match in matches:
             metadata = match["metadata"]
             content = metadata["content"]
             print(f"{content}\n")
+            json_content = json.load(content)
+            print(json_content.title)
 
     except BaseException as e:
         print(f"[ERROR] {e}")

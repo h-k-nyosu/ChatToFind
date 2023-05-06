@@ -20,7 +20,7 @@ res = openai.Embedding.create(
     engine=MODEL,
 )
 
-pinecone.init(api_key=os.environ.get("PINCONE_API_KEY"), environment="us-east1-gcp")
+pinecone.init(api_key=os.environ.get("PINECONE_API_KEY"), environment="us-east1-gcp")
 index = pinecone.Index("chat-to-find")
 
 GENERATE_JOB_TEXT = """
