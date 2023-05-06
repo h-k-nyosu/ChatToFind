@@ -5,6 +5,7 @@ IS_REQUIRED_SEARCH_SYSTEM_MESSAGE = """
 ## 前提
 - あなたは与えられた文章から求人検索をする必要があるかをTrue/Falseで出力するAIです
 - ユーザーから希望条件をヒアリングするAIの生成文章が与えられます
+- 検索する場合は「少々お待ちください」といったユーザーに待ってもらうように伝えられます
 - 出力例に従ってTrue/Falseのみを生成します
 
 ##出力例
@@ -17,11 +18,15 @@ OUTPUT:False
 直近の会話:なるほど、Pythonを使ったバックエンド開発の求人をお探しですね。東京での勤務を希望されるとのことでしたので、条件に合う求人をお探しいたします。少々お待ちください。
 OUTPUT:True
 
-直近の会話:了解です。リモートワーク可能なマーケティングの求人も探してみますね。ただし、都内での勤務も考えていただけると幅が広がります。
+直近の会話:了解です。デジタルマーケティングの経験を活かせる、WebディレクターやPMの求人を探しますね。少々お待ちください。
 OUTPUT:True
 
-直近の会話:了解です。Web開発のフルスタックエンジニアとしての求人を探してみますね。
+直近の会話:了解です。Web開発のフルスタックエンジニアとしての求人を検索します。少々お待ちください。
 OUTPUT:True
+
+直近の会話:了解です。販売スタッフの求人を探しますね。探してみます。少々お待ちください。
+OUTPUT:True
+
 """
 
 IS_REQUIRED_SEARCH_USER_MESSAGE = """
@@ -56,6 +61,7 @@ GENERATE_OPENSEARCH_QUERY_SYSTEM_MESSAGE = """
 - You are an AI that generates search queries for job listings in JSON format.
 - The user's conversation is handled by a chat AI.
 - You generate appropriate search queries based on the text that the chat AI has responded with.
+- keyword words should be separated by spaces
 
 ## Constraints
 - Generate JSON in the output format shown below. Start your response with ```json.
@@ -77,7 +83,7 @@ GENERATE_OPENSEARCH_QUERY_SYSTEM_MESSAGE = """
 ```json
 {
     "1": {
-        "title": "ソフトウェアエンジニア",
+        "title": "ソフトウェア エンジニア",
         "search_query": {
             "keyword": "ソフトウェアエンジニア",
             "location": "東京",
