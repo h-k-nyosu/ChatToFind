@@ -1,9 +1,15 @@
+import openai
+import json
+import numpy as np
 from opensearch_dsl import Search, Q
+from typing import Dict, Any
 
 from abc import ABC, abstractmethod
 
 from app.schemas import Job as JobSchema
+from app.schemas import JobBase
 from app.database.opensearch import os_client
+from app.database.pinecone import index
 
 
 class BaseQueries(ABC):
@@ -82,3 +88,52 @@ class OpensearchQueries(BaseQueries):
 
         response = search.execute()
         return [self._transform_hit_to_job(hit) for hit in response.hits]
+
+
+import random
+from typing import List
+
+
+class PineconeQueries(BaseQueries):
+    def __init__(self):
+        self.index = index
+
+    def _transform_hit_to_job(self, hit: Dict[str, Any]) -> JobSchema:
+        metadata = hit["metadata"]
+        job_data = json.loads(metadata["content"])
+        job_data["id"] = hit["id"]
+        return JobSchema(**job_data)
+
+    def get_job(self, job_id: str) -> JobSchema:
+        response = self.index.fetch(ids=[job_id])
+
+        return self._transform_hit_to_job(response["vectors"][job_id])
+
+    def get_jobs(self, num_jobs: int = 120) -> List[JobSchema]:
+        dimension = self.index.describe_index_stats()["dimension"]
+        sample_vector = np.random.rand(dimension).tolist()
+        response = self.index.query(
+            vector=sample_vector, top_k=num_jobs, include_metadata=True
+        )
+        matches = response["matches"]
+        jobs = []
+        for match in matches:
+            try:
+                job = self._transform_hit_to_job(match)
+                jobs.append(job)
+            except Exception:
+                pass
+        print(len(jobs))
+        return jobs
+
+    def get_custom_jobs(self, generated_jobs: str) -> List[JobSchema]:
+        # generated_jobs の処理
+
+        res = openai.Embedding.create(
+            input=generated_jobs, engine="text-embedding-ada-002"
+        )
+        embed = res["data"][0]["embedding"]
+
+        result = self.index.query(vector=embed, top_k=3, include_metadata=True)
+        matches = result["matches"]
+        return [self._transform_hit_to_job(hit) for hit in matches]
