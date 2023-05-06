@@ -7,8 +7,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 
 from app.llm.chat import generate_chat_response
-from app.llm.generate_search_query import generate_search_query, is_required_search
-from app.database.queries import OpensearchQueries
+from app.llm.generate_query import generate_opensearch_query, is_required_search
+from app.database.queries import OpensearchQueries, PineconeQueries
 from app.utils.parse_json import parse_json
 from app.utils.conversation_history import ConversationHistory
 
@@ -19,6 +19,7 @@ app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
 
 opensearch_queries = OpensearchQueries()
+pinecone_queries = PineconeQueries()
 conversation_history = ConversationHistory()
 
 
@@ -48,7 +49,7 @@ async def job_detail(job_id: str, request: Request):
 @app.get("/pinecone/")
 async def pinecone_index(request: Request):
     session_id = str(uuid.uuid4())
-    jobs = opensearch_queries.get_jobs()
+    jobs = pinecone_queries.get_jobs()
     jobs_per_row = 30
     job_rows = [jobs[i : i + jobs_per_row] for i in range(0, len(jobs), jobs_per_row)]
 
@@ -60,7 +61,7 @@ async def pinecone_index(request: Request):
 
 @app.get("/pinecone/jobs/{job_id}")
 async def job_detail(job_id: str, request: Request):
-    job = opensearch_queries.get_job(job_id)
+    job = pinecone_queries.get_job(job_id)
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return templates.TemplateResponse(
@@ -85,7 +86,7 @@ async def get_search_items(message: str, session_id: str):
         search_required = await is_required_search(message)
         if not search_required:
             return
-        search_query_str = await generate_search_query(message)
+        search_query_str = await generate_opensearch_query(message)
 
         print(f"search_query_str: {search_query_str}")
         search_query_list = parse_json(search_query_str)
@@ -118,7 +119,7 @@ async def get_search_items(message: str, session_id: str):
         search_required = await is_required_search(message)
         if not search_required:
             return
-        search_query_str = await generate_search_query(message)
+        search_query_str = await generate_opensearch_query(message)
 
         print(f"search_query_str: {search_query_str}")
         search_query_list = parse_json(search_query_str)
