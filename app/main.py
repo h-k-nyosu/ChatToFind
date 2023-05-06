@@ -1,13 +1,18 @@
 import asyncio
 import traceback
 import uuid
+import json
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
 
 from app.llm.chat import generate_chat_response
-from app.llm.generate_query import generate_opensearch_query, is_required_search
+from app.llm.generate_query import (
+    generate_opensearch_query,
+    generate_pinecone_query,
+    is_required_search,
+)
 from app.database.queries import OpensearchQueries, PineconeQueries
 from app.utils.parse_json import parse_json
 from app.utils.conversation_history import ConversationHistory
@@ -119,23 +124,23 @@ async def get_search_items(message: str, session_id: str):
         search_required = await is_required_search(message)
         if not search_required:
             return
-        search_query_str = await generate_opensearch_query(message)
-
+        search_query_str = await generate_pinecone_query(message)
         print(f"search_query_str: {search_query_str}")
-        search_query_list = parse_json(search_query_str)
-
-        print(f"search_query_list: {search_query_list}")
-        if not search_query_list:
-            return
 
         response = []
-        for search_query in search_query_list:
+        print(
+            f"json.loads(search_query_str).items(): {json.loads(search_query_str).items()}\n"
+        )
+        for _, search_query in json.loads(search_query_str).items():
             print(f"search_query: {search_query['search_query']}")
-            search_results = opensearch_queries.get_custom_jobs(
-                query_params=search_query["search_query"]
+            search_results = pinecone_queries.get_custom_jobs(
+                generated_jobs=json.dumps(search_query["search_query"])
             )
             response.append(
-                {"title": search_query["title"], "search_results": search_results}
+                {
+                    "title": search_query["search_title"],
+                    "search_results": search_results,
+                }
             )
         print(f"response: {response}")
         return response

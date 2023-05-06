@@ -21,11 +21,11 @@ class ConversationHistory:
         history = self.get_history(session_id)
         return self._format_conversations(history)
 
-    def get_recent_conversations(self, session_id, count=5):
+    def get_recent_conversations(self, session_id, count=10):
         history = self.get_history(session_id)
         return history[-count:]
 
-    def format_recent_conversations(self, session_id, count=5):
+    def format_recent_conversations(self, session_id, count=10):
         recent_conversations = self.get_recent_conversations(session_id, count)
         return self._format_conversations(recent_conversations)
 

@@ -1,7 +1,8 @@
+const path = window.location.pathname;
+
 export async function fetchSearchItems(message, sessionId) {
   console.log("fetchSearchItems start");
   try {
-    const path = window.location.pathname;
     const response = await fetch(
       `${path}search-items?message=${encodeURIComponent(
         message
@@ -28,7 +29,7 @@ export async function fetchSearchItems(message, sessionId) {
 
 function renderItem(job) {
   return `
-        <a href="/jobs/${job.id}" target="_blank" rel="noopener noreferrer">
+        <a href="${path}jobs/${job.id}" target="_blank" rel="noopener noreferrer">
           <div class="item">
             <p class="item-job-type">#${job.job_type}</p>
             <h3 class="item-job-title">${job.title}</h3>

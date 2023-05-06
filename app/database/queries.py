@@ -134,6 +134,6 @@ class PineconeQueries(BaseQueries):
         )
         embed = res["data"][0]["embedding"]
 
-        result = self.index.query(vector=embed, top_k=3, include_metadata=True)
+        result = self.index.query(vector=embed, top_k=20, include_metadata=True)
         matches = result["matches"]
         return [self._transform_hit_to_job(hit) for hit in matches]

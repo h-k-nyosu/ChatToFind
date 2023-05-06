@@ -101,14 +101,13 @@ GENERATE_OPENSEARCH_QUERY_SYSTEM_MESSAGE = """
 """
 
 GENERATE_OPENSEARCH_QUERY_USER_MESSAGE = """
-## response by Chat AI
-{ai_message}
+{messages}
 
 ## Output
 """
 
 
-async def generate_opensearch_query(ai_message):
+async def generate_opensearch_query(messages):
     openai.api_key = OPENAI_API_KEY
 
     response = await openai.ChatCompletion.acreate(
@@ -118,7 +117,7 @@ async def generate_opensearch_query(ai_message):
             {
                 "role": "user",
                 "content": GENERATE_OPENSEARCH_QUERY_USER_MESSAGE.format(
-                    message=ai_message
+                    messages=messages
                 ),
             },
         ],
@@ -130,17 +129,53 @@ async def generate_opensearch_query(ai_message):
     return query
 
 
-async def generate_opensearch_query(message):
+GENERATE_PINECONE_QUERY_SYSTEM_MESSAGE = """
+与えられた会話履歴のデータをもとに、ユーザーが働きたいと思えるような求人原稿について、以下の項目で1000字程度で記載してください。
+
+## 制約条件
+・内容は実際にありそうな具体的なものにしてください。実在しなくても可。
+・仕事詳細は500文字以上で具体的に記載します
+・月給はINT型です
+・求人タイトル、仕事概要、仕事詳細は求人に応募したいと思う魅力的な文章にしてください
+・出力形式は```jsonから始まり、```で終わるようにしてください
+
+
+## 出力例
+```json
+{{
+    "1": {
+        "search_title": "Webアプリケーション開発エンジニア",
+        "search_query": {
+            "title": "Webアプリケーション開発エンジニア募集！",
+            "job_type": "ソフトウェアエンジニア",
+            "job_summary": "当社の開発チームで、Webアプリケーションの開発を担当していただくエンジニアを募集しています。",
+            "job_details": "ReactやAngularを使ったフロントエンド開発、PHPやRuby on Railsを使ったバックエンド開発、データベース設計やデータベースの最適化、AWSのクラウド環境の構築、運用・保守、プロジェクトマネジメントなど、幅広い業務をお任せします。開発環境は個人の希望に合わせて調整可能です。",
+            "monthly_salary": 350000,
+            "location": "東京都千代田区"
+        }
+    }
+}}
+```
+"""
+
+GENERATE_PINECONE_QUERY_USER_MESSAGE = """
+{messages}
+
+## Output
+"""
+
+
+async def generate_pinecone_query(messages):
     openai.api_key = OPENAI_API_KEY
 
     response = await openai.ChatCompletion.acreate(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": GENERATE_OPENSEARCH_QUERY_SYSTEM_MESSAGE},
+            {"role": "system", "content": GENERATE_PINECONE_QUERY_SYSTEM_MESSAGE},
             {
                 "role": "user",
-                "content": GENERATE_OPENSEARCH_QUERY_USER_MESSAGE.format(
-                    message=message
+                "content": GENERATE_PINECONE_QUERY_USER_MESSAGE.format(
+                    messages=messages
                 ),
             },
         ],
@@ -148,5 +183,4 @@ async def generate_opensearch_query(message):
     )
 
     query = response["choices"][0]["message"]["content"]
-    print(f"query: {query}")
     return query
